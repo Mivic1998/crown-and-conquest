@@ -1,0 +1,1 @@
+web: gunicorn crown_and_conquest.wsgi
