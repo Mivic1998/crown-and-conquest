@@ -55,6 +55,8 @@ INSTALLED_APPS = [
 
     # Local apps
     'core',
+    'kingdom',
+    'wars',
 ]
 
 SITE_ID = 1
