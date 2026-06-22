@@ -36,7 +36,7 @@ ALLOWED_HOSTS = ['.herokuapp.com',
 # Application definition
 
 INSTALLED_APPS = [
-    'core',
+    # Django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,9 +44,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+
+    # Third-party apps
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'django_summernote',
+
+    # Local apps
+    'core',
 ]
 
 SITE_ID = 1
