@@ -10,9 +10,16 @@ class KingdomLeaderboard(generic.ListView):
     paginate_by = 25
 
 def kingdom_detail(request, slug):
+
     queryset = Kingdom.objects.all()
     kingdom = get_object_or_404(queryset, slug=slug)
-    return render(
+    
+    user_kingdom = getattr(request.user, "kingdom", None)
+
+    if kingdom == user_kingdom:
+        return redirect("dashboard")
+    else: 
+        return render(
         request,
         "core/kingdom_detail.html",
         {
