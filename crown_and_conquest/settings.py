@@ -52,12 +52,18 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'django_summernote',
     'cloudinary',
+    'crispy_forms',
+    'crispy_bootstrap5',
+
 
     # Local apps
     'core',
     'kingdom',
     'wars',
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
