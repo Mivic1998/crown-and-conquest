@@ -4,5 +4,5 @@ from .views import KingdomList
 
 urlpatterns = [
     path("leaderboard/", views.KingdomLeaderboard.as_view(), name="leaderboard"),
-     path('leaderboard/<slug:slug>/', views.kingdom_detail, name='post_detail'),
+     path('leaderboard/<slug:slug>/', views.kingdom_detail, name='kingdom_detail'),
 ]

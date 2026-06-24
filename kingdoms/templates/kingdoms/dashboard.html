@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<h1>{{ kingdom.name }}</h1>
+
+<h3>Ruler: {{ kingdom.ruler_name }}</h3>
+<p>Turn: {{ kingdom.turn_number }}</p>
+
+<hr>
+
+<h2>Kingdom Stats</h2>
+<ul>
+    <li>Population: {{ kingdom.population }}</li>
+    <li>Treasury: {{ kingdom.treasury }}</li>
+    <li>Food: {{ kingdom.food }}</li>
+    <li>Happiness: {{ kingdom.happiness }}</li>
+    <li>Stability: {{ kingdom.stability }}</li>
+    <li>Army Size: {{ kingdom.army_size }}</li>
+</ul>
+
+<hr>
+
+<h2>Set Policies</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Policies</button>
+</form>
+
+<hr>
+
+<h2>Turn Control</h2>
+
+<form action="{% url 'take_turn' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit">End Turn</button>
+</form>
+{% endblock %}
