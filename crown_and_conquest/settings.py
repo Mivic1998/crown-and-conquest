@@ -58,7 +58,7 @@ INSTALLED_APPS = [
 
     # Local apps
     'core',
-    'kingdom',
+    'kingdoms',
     'wars',
 ]
 
