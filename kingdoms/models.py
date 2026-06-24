@@ -52,6 +52,8 @@ class Kingdom(models.Model):
     # Turn system
     turn_number = models.IntegerField(default=1)
 
+    territory_count = models.IntegerField(default = 50)
+
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

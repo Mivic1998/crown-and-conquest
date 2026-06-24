@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% for kingdom in kingdom_list %}
+<tr>
+    <td>{{ forloop.counter }}</td>
+    <td>
+        <a href="{% url 'kingdom_detail' kingdom.slug %}">
+            {{ kingdom.name }}
+        </a>
+    </td>
+    <td>{{ kingdom.ruler.username }}</td>
+    <td>{{ kingdom.territory_count }}</td>
+    <td>{{ kingdom.population }}</td>
+</tr>
+{% endfor %}
+{% endblock %}
