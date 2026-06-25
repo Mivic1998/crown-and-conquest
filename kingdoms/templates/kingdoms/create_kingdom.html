@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<form action="{% url 'take_turn' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit">Create Kingdom</button>
+</form>
+{% endblock %}

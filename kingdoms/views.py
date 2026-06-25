@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .forms import PolicyForm
+from .forms import PolicyForm, CreateKingdomForm
 from .models import Kingdom
 
 # Create your views here.
@@ -25,3 +25,18 @@ def dashboard(request):
             "form": form,
         },
     )
+
+def create_kingdom(request):
+    if hasattr(request.user, "kingdom"):
+        redirect("dashboard")
+    if request.method == "POST":
+        form = CreateKingdomForm(request.POST)
+        if form.is_valid():
+            kingdom = form.save(commit=False)
+            kingdom.owner = request.user
+            kingdom.save()
+            return redirect("dashboard")
+    else:
+        form = CreateKingdomForm()
+
+    return render(request, "create_kingdom.html", {"form": form})

@@ -11,3 +11,8 @@ class PolicyForm(forms.ModelForm):
             "military_investment",
             "welfare_investment",
         ]
+
+class CreateKingdomForm(forms.ModelForm):
+    class Meta:
+        model = Kingdom
+        fields = ["name"]
