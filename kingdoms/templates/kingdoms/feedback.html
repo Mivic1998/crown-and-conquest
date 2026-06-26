@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <h1>End of Turn Report</h1>
+    <h3>Turn {{ turn.turn_number }}</h3>
+
+    <hr>
+
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <h4>👥 Population</h4>
+            <p>{{ turn.population }} citizens</p>
+
+            <h4>Treasury</h4>
+            <p>{{ turn.treasury }} gold</p>
+
+            <h4>Food Stores</h4>
+            <p>{{ turn.food }} food</p>
+
+            <h4>Happiness</h4>
+            <p>{{ turn.happiness|floatformat:1 }}/100</p>
+
+            <h4>Stability</h4>
+            <p>{{ turn.stability|floatformat:1 }}/100</p>
+
+            <h4>Army Size</h4>
+            <p>{{ turn.army_size }} soldiers</p>
+
+            <h4>Army Quality</h4>
+            <p>{{ turn.army_quality|floatformat:1 }}</p>
+
+        </div>
+    </div>
+
+
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <h3>Policies Enacted</h3>
+
+            <ul>
+                <li>Tax Rate: {{ turn.tax_rate }}%</li>
+                <li>Agricultural Investment: {{ turn.agriculture_investment }}</li>
+                <li>Infrastructure Investment: {{ turn.infrastructure_investment }}</li>
+                <li>Military Investment: {{ turn.military_investment }}</li>
+                <li>Welfare Investment: {{ turn.welfare_investment }}</li>
+            </ul>
+
+        </div>
+    </div>
+
+
+    {% if turn.event %}
+    <div class="card border-danger mb-4">
+        <div class="card-body">
+
+            <h2>A Major Event Has Occurred!</h2>
+
+            <p>
+                Your advisors urgently request your attention.
+            </p>
+
+            <p>
+                Event: <strong>{{ turn.event|title }}</strong>
+            </p>
+
+            <a href="{% url 'event_page' turn.id %}"
+               class="btn btn-danger">
+                Respond to Event
+            </a>
+
+        </div>
+    </div>
+
+    {% else %}
+
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <h3>Peace Prevails</h3>
+
+            <p>
+                No major incidents occurred this turn.
+                Your realm enjoys a period of relative calm.
+            </p>
+
+        </div>
+    </div>
+
+    {% endif %}
+
+
+    <div class="text-center mt-4">
+        <a href="{% url 'dashboard' %}"
+           class="btn btn-primary">
+            Return to Dashboard
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}
+

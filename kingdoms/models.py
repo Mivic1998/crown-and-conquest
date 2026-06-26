@@ -66,7 +66,11 @@ class TurnHistory(models.Model):
 
     turn_number = models.IntegerField()
 
-    event = models.CharField(default="none")
+    event = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True
+    )
 
     # Snapshot of key values
     population = models.IntegerField()
@@ -87,8 +91,8 @@ class TurnHistory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        get_latest_by = 'created_at'
-
+        ordering = ["turn_number"]
+        get_latest_by = "turn_number"
 
     def __str__(self):
         return f"{self.kingdom.name} - Turn {self.turn_number}"

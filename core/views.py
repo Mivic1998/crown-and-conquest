@@ -6,7 +6,7 @@ from kingdoms.models import Kingdom
 
 class KingdomLeaderboard(generic.ListView):
     queryset = Kingdom.objects.order_by("-population")
-    template_name = "leaderboard.html"
+    template_name = "core/leaderboard.html"
     paginate_by = 25
 
 def kingdom_detail(request, slug):
