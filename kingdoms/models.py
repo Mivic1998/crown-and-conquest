@@ -66,6 +66,8 @@ class TurnHistory(models.Model):
 
     turn_number = models.IntegerField()
 
+    event = models.CharField(default="none")
+
     # Snapshot of key values
     population = models.IntegerField()
     treasury = models.FloatField()
@@ -83,6 +85,10 @@ class TurnHistory(models.Model):
     tax_rate = models.FloatField()
 
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        get_latest_by = 'created_at'
+
 
     def __str__(self):
         return f"{self.kingdom.name} - Turn {self.turn_number}"

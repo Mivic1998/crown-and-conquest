@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
 from .forms import PolicyForm, CreateKingdomForm
-from .models import Kingdom
+from .models import Kingdom, TurnHistory
 from simulation import process_turn
+from events import evaluate_events
 
 # Create your views here.
 
@@ -52,4 +53,23 @@ def create_kingdom(request):
     return render(request, "kingdoms/create_kingdom.html", {"form": form})
 
 def take_turn(request):
-    print('Hello World')
+    user_kingdom = getattr(request.user, "kingdom", None)
+    process_turn(user_kingdom)
+    latest_turn = TurnHistory.objects.latest()
+    event = evaluate_events(user_kingdom)
+    if(event):
+        latest_turn.event = event
+    return render(
+        request,
+        "kingdoms/feedback.html",
+        {
+            "kingdom": user_kingdom,
+            "turn": latest_turn,
+        },
+    )    
+    
+    
+
+
+
+    
