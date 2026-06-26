@@ -55,7 +55,7 @@ def create_kingdom(request):
 def take_turn(request):
     user_kingdom = getattr(request.user, "kingdom", None)
     process_turn(user_kingdom)
-    latest_turn = TurnHistory.objects.latest()
+    latest_turn = TurnHistory.objects.filter(kingdom=user_kingdom).latest()
     event = evaluate_events(user_kingdom)
     if(event):
         latest_turn.event = event

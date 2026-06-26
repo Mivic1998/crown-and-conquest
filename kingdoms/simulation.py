@@ -1,4 +1,4 @@
-from models import Kingdom, TurnHistory
+from .models import Kingdom, TurnHistory
 import random
 
 def clamp(value, minimum, maximum):
@@ -108,12 +108,15 @@ def process_turn(kingdom):
 
     # 12. Save updated kingdom
     kingdom.save()
+    
+    latest_turn = 1
 
-    latest_turn = TurnHistory.objects.latest()
+    if TurnHistory.objects.filter(kingdom=kingdom).exists():
+        latest_turn = TurnHistory.objects.filter(kingdom=kingdom).latest().turn_number + 1
 
     TurnHistory.objects.create(
         kingdom=kingdom,
-        turn_number=latest_turn + 1,
+        turn_number=latest_turn,
         population=kingdom.population,
         treasury=kingdom.treasury,
         food=kingdom.food,

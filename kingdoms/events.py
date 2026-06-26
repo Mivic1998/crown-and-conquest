@@ -1,4 +1,4 @@
-from models import Kingdom
+from .models import Kingdom
 import random
 
 def evaluate_events(kingdom):
@@ -15,7 +15,7 @@ def evaluate_events(kingdom):
     probabilities = {
         "famine": 0.02 + max(0, -food_balance/food_needed) * 0.5,
         "riot": 0.03 + (100 - happiness)/100 * 0.2 + (100 - stability)/100 * 0.2,
-        "rebellion": max(0, (50 - stability)/50 + (50 - happiness)/50) * 0.4,
+        "rebellion": max(0, (50 - stability)/100 + (50 - happiness)/100) * 0.4,
         "market": 0.02 + (tax_rate/100 * 0.2) + ((100 - stability)/100 * 0.3),
         "desertion": (100 - happiness)/100 * 0.3
     }
