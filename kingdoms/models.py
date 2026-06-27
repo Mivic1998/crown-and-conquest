@@ -24,6 +24,10 @@ class Kingdom(models.Model):
     # Food system
     food = models.FloatField(default=1000)
 
+    # Famine modifiers
+    famine_turns_remaining = models.IntegerField(default=0)
+    food_production_modifier = models.FloatField(default=1.0)
+
     # Core metrics
     happiness = models.FloatField(default=50)
     stability = models.FloatField(default=50)
@@ -98,34 +102,69 @@ class TurnHistory(models.Model):
         return f"{self.kingdom.name} - Turn {self.turn_number}"
     
 class Event(models.Model):
+
+    EVENT_TYPES = [
+        ("famine", "Famine"),
+        ("riot", "Riot"),
+        ("rebellion", "Rebellion"),
+        ("market_crash", "Market Crash"),
+        ("desertion", "Desertion"),
+    ]
+
     kingdom = models.ForeignKey(
         Kingdom,
         on_delete=models.CASCADE,
         related_name="events"
     )
 
+    turn = models.ForeignKey(
+        TurnHistory,
+        on_delete=models.CASCADE,
+        related_name="events",
+        null=True,
+        blank=True
+    )
+
     turn_number = models.IntegerField()
 
-    event_type = models.CharField(max_length=50)
+    event_type = models.CharField(
+        max_length=50,
+        choices=EVENT_TYPES
+    )
 
-    description = models.TextField()
+    description = models.TextField(blank=True)
 
-    # Effects applied
+    # Immediate effects already applied
     population_change = models.IntegerField(default=0)
     treasury_change = models.FloatField(default=0)
+    food_change = models.FloatField(default=0)
+    army_size_change = models.IntegerField(default=0)
+    army_quality_change = models.FloatField(default=0)
     happiness_change = models.FloatField(default=0)
     stability_change = models.FloatField(default=0)
 
+    # Ongoing modifiers
+    duration_turns = models.IntegerField(default=0)
+    food_production_modifier = models.FloatField(default=1.0)
+    tax_income_modifier = models.FloatField(default=1.0)
+
+    # Player response flow
+    is_resolved = models.BooleanField(default=False)
+    player_response = models.TextField(blank=True, null=True)
+    ai_score = models.FloatField(blank=True, null=True)
+    ai_feedback = models.TextField(blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
+    resolved_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.kingdom.name} - {self.event_type}"
+        return f"{self.kingdom.name} - {self.event_type} - Turn {self.turn_number}"
 
 class AIResponse(models.Model):
     event = models.OneToOneField(
         Event,
         on_delete=models.CASCADE,
-        related_name="ai_response"
+        related_name="response"
     )
 
     player_input = models.TextField()
@@ -138,3 +177,4 @@ class AIResponse(models.Model):
 
     def __str__(self):
         return f"AI Response - {self.event.event_type}"
+    

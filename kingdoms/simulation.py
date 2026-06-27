@@ -1,4 +1,5 @@
 from .models import Kingdom, TurnHistory
+from .events import evaluate_events, apply_event_effects
 import random
 
 def clamp(value, minimum, maximum):
@@ -25,7 +26,7 @@ def process_turn(kingdom):
     # 2. Food production
     food_noise = random_noise(kingdom.stability)
     expected_food = kingdom.population * kingdom.a_eff
-    food_production = expected_food * (1 + food_noise)
+    food_production = expected_food * kingdom.famine_production_modifier * (1 + food_noise)
     storage_rate = 0.25
 
     # 3. Carrying capacity
@@ -106,15 +107,23 @@ def process_turn(kingdom):
     # 11. Advance turn
     kingdom.turn_number += 1
 
+    if kingdom.famine_turns_remaining > 0:
+        kingdom.famine_turns_remaining -= 1
+    if kingdom.famine_turns_remaining == 0:
+        kingdom.food_production_modifier = 1.0  
+
     # 12. Save updated kingdom
-    kingdom.save()
+    kingdom.save()  
+
+    event = evaluate_events(kingdom)
+    apply_event_effects(kingdom, event)
     
     latest_turn = 1
 
     if TurnHistory.objects.filter(kingdom=kingdom).exists():
         latest_turn = TurnHistory.objects.filter(kingdom=kingdom).latest().turn_number + 1
 
-    TurnHistory.objects.create(
+    turn = TurnHistory.objects.create(
         kingdom=kingdom,
         turn_number=latest_turn,
         population=kingdom.population,
@@ -135,7 +144,7 @@ def process_turn(kingdom):
         welfare_investment=kingdom.welfare_investment,
     )
 
-    return kingdom
+    return turn
 
 
 
