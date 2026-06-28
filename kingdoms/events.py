@@ -103,49 +103,49 @@ def apply_event_effects(kingdom, event):
         return
 
     if event == "famine":
-        kingdom.famine_turns_remaining += event_effects.famine.turns
+        kingdom.famine_turns_remaining += EVENT_EFFECTS.famine.turns
         kingdom.famine_production_modifier *= (
-            event_effects.famine.production_modifier
+            EVENT_EFFECTS.famine.production_modifier
         )
-        kingdom.happiness -= event_effects.famine.happiness
-        kingdom.stability -= event_effects.famine.stability
+        kingdom.happiness -= EVENT_EFFECTS.famine.happiness
+        kingdom.stability -= EVENT_EFFECTS.famine.stability
         kingdom.population = int(
             kingdom.population *
-            (1 - event_effects.famine.population_percent)
+            (1 - EVENT_EFFECTS.famine.population_percent)
         )
 
     elif event == "riot":
-        kingdom.treasury -= event_effects.riot.treasury
-        kingdom.happiness -= event_effects.riot.happiness
-        kingdom.stability -= event_effects.riot.stability
+        kingdom.treasury -= EVENT_EFFECTS.riot.treasury
+        kingdom.happiness -= EVENT_EFFECTS.riot.happiness
+        kingdom.stability -= EVENT_EFFECTS.riot.stability
 
     elif event == "rebellion":
         kingdom.population = int(
             kingdom.population *
-            (1 - event_effects.rebellion.population_percent)
+            (1 - EVENT_EFFECTS.rebellion.population_percent)
         )
         kingdom.army_size = int(
             kingdom.army_size *
-            (1 - event_effects.rebellion.army_size_percent)
+            (1 - EVENT_EFFECTS.rebellion.army_size_percent)
         )
-        kingdom.happiness -= event_effects.rebellion.happiness
-        kingdom.stability -= event_effects.rebellion.stability
+        kingdom.happiness -= EVENT_EFFECTS.rebellion.happiness
+        kingdom.stability -= EVENT_EFFECTS.rebellion.stability
 
     elif event == "market_crash":
         kingdom.treasury = int(
             kingdom.treasury *
-            (1 - event_effects.market_crash.treasury_percent)
+            (1 - EVENT_EFFECTS.market_crash.treasury_percent)
         )
-        kingdom.happiness -= event_effects.market_crash.happiness
-        kingdom.stability -= event_effects.market_crash.stability
+        kingdom.happiness -= EVENT_EFFECTS.market_crash.happiness
+        kingdom.stability -= EVENT_EFFECTS.market_crash.stability
 
     elif event == "desertion":
         kingdom.army_size = int(
             kingdom.army_size *
-            (1 - event_effects.desertion.army_size_percent)
+            (1 - EVENT_EFFECTS.desertion.army_size_percent)
         )
-        kingdom.army_quality -= event_effects.desertion.army_quality
-        kingdom.stability -= event_effects.desertion.stability
+        kingdom.army_quality -= EVENT_EFFECTS.desertion.army_quality
+        kingdom.stability -= EVENT_EFFECTS.desertion.stability
 
 
 

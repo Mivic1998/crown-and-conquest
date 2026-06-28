@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="card shadow">
+
+        <div class="card-header">
+            <h1>Crisis in the Realm</h1>
+        </div>
+
+        <div class="card-body">
+
+            <h2>{{ event.get_event_type_display|default:event.event_type|title }}</h2>
+
+            <p class="lead">
+                Turn {{ event.turn_number }}
+            </p>
+
+            <hr>
+
+            <h3>Report from your advisors</h3>
+
+            <p>
+                {{ event.description }}
+            </p>
+
+            <hr>
+
+            <h3>Current Consequences</h3>
+
+            <ul>
+                {% if event.population_change %}
+                    <li>Population: {{ event.population_change }}</li>
+                {% endif %}
+
+                {% if event.treasury_change %}
+                    <li>Treasury: {{ event.treasury_change }}</li>
+                {% endif %}
+
+                {% if event.happiness_change %}
+                    <li>Happiness: {{ event.happiness_change }}</li>
+                {% endif %}
+
+                {% if event.stability_change %}
+                    <li>Stability: {{ event.stability_change }}</li>
+                {% endif %}
+
+                {% if event.duration_turns %}
+                    <li>Expected Duration: {{ event.duration_turns }} turns</li>
+                {% endif %}
+            </ul>
+
+            <hr>
+
+            <h3>Your Royal Decree</h3>
+
+            <p>
+                Your subjects await your decision. Describe the actions you will take to address this crisis.
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="response" class="form-label">
+                        Response
+                    </label>
+
+                    <textarea
+                        id="response"
+                        name="response"
+                        class="form-control"
+                        rows="10"
+                        placeholder="Example: I shall immediately reduce taxes, distribute grain reserves to the poorest citizens, and dispatch envoys to neighbouring kingdoms to purchase additional food supplies."
+                        required
+                    ></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-danger">
+                    Submit Royal Decree
+                </button>
+
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                    Return to Dashboard
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+

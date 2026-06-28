@@ -70,12 +70,6 @@ class TurnHistory(models.Model):
 
     turn_number = models.IntegerField()
 
-    event = models.CharField(
-        max_length=50,
-        null=True,
-        blank=True
-    )
-
     # Snapshot of key values
     population = models.IntegerField()
     treasury = models.FloatField()
@@ -117,10 +111,10 @@ class Event(models.Model):
         related_name="events"
     )
 
-    turn = models.ForeignKey(
+    turn = models.OneToOneField(
         TurnHistory,
         on_delete=models.CASCADE,
-        related_name="events",
+        related_name="event",
         null=True,
         blank=True
     )

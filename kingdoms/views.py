@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.utils.text import slugify
@@ -88,11 +88,24 @@ def take_turn(request):
 
     return render(
         request,
-        "kingdoms/feedback.html",
+        "kingdoms/turn_feedback.html",
         {
             "turn": turn
         },
     )
 
-def event_detail(request):
+@login_required
+def respond_to_event(request, event_id):
+    event = get_object_or_404(
+        Event,
+        id=event_id,
+        kingdom=request.user.kingdom #Ensures only user to whom
+    )
+
+    return render(
+        request,
+        "kingdoms/event_detail.html",
+        {"event": event}
+    )
+
     
