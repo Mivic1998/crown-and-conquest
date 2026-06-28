@@ -70,6 +70,12 @@ class TurnHistory(models.Model):
 
     turn_number = models.IntegerField()
 
+    event_type = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True
+    )   
+
     # Snapshot of key values
     population = models.IntegerField()
     treasury = models.FloatField()
@@ -144,7 +150,11 @@ class Event(models.Model):
 
     # Player response flow
     is_resolved = models.BooleanField(default=False)
+    report_seen = models.BooleanField(default=False)
     player_response = models.TextField(blank=True, null=True)
+    empathy = models.FloatField()
+    practicality = models.FloatField()
+    leadership = models.FloatField()
     ai_score = models.FloatField(blank=True, null=True)
     ai_feedback = models.TextField(blank=True, null=True)
 
@@ -154,21 +164,3 @@ class Event(models.Model):
     def __str__(self):
         return f"{self.kingdom.name} - {self.event_type} - Turn {self.turn_number}"
 
-class AIResponse(models.Model):
-    event = models.OneToOneField(
-        Event,
-        on_delete=models.CASCADE,
-        related_name="response"
-    )
-
-    player_input = models.TextField()
-
-    empathy = models.FloatField()
-    practicality = models.FloatField()
-    leadership = models.FloatField()
-
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"AI Response - {self.event.event_type}"
-    

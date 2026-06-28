@@ -1,5 +1,5 @@
 from .models import Kingdom, TurnHistory
-from .events import evaluate_events, apply_event_effects
+from .events import evaluate_events
 import random
 
 def clamp(value, minimum, maximum):
@@ -116,7 +116,6 @@ def process_turn(kingdom):
     kingdom.save()  
 
     event = evaluate_events(kingdom)
-    apply_event_effects(kingdom, event)
     
     latest_turn = 1
 
@@ -144,7 +143,7 @@ def process_turn(kingdom):
         welfare_investment=kingdom.welfare_investment,
     )
 
-    return turn
+    return event, turn
 
 
 

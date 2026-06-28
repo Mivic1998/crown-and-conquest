@@ -8,7 +8,7 @@ EVENT_EFFECTS = {
             "throughout the realm. Food production will be severely reduced."
         ),
         "turns": 3,
-        "production_modifier": 0.65,
+        "production_modifier": 0.35,
         "population_percent": -0.03,
         "happiness": -8,
         "stability": -5,
@@ -91,63 +91,107 @@ def evaluate_events(kingdom):
 
     return event        
 
-def apply_event_effects(kingdom, event):
+def apply_event_response_effects(event):
     """
-    Apply the immediate penalty caused by an event.
+    Apply event effects after the player's response has been evaluated.
 
-    This function does not save the kingdom.
-    Save after calling it inside process_turn().
+    The event type determines which penalties apply.
+    The AI score determines how severe those penalties are.
     """
 
-    if not event:
-        return
+    kingdom = event.kingdom
 
-    if event == "famine":
-        kingdom.famine_turns_remaining += EVENT_EFFECTS.famine.turns
+    score = event.ai_score or 0
+    score = max(0, min(score, 10))
+
+    severity = 1 - (score / 10)
+
+    effects = EVENT_EFFECTS[event.event_type]
+
+    if event.event_type == "famine":
+        kingdom.famine_turns_remaining += max(
+            1,
+            int(effects["turns"] * severity)
+        )
+
         kingdom.famine_production_modifier *= (
-            EVENT_EFFECTS.famine.production_modifier
-        )
-        kingdom.happiness -= EVENT_EFFECTS.famine.happiness
-        kingdom.stability -= EVENT_EFFECTS.famine.stability
-        kingdom.population = int(
-            kingdom.population *
-            (1 - EVENT_EFFECTS.famine.population_percent)
+            1 - (
+                (1 - effects["production_modifier"])
+                * severity
+            )
         )
 
-    elif event == "riot":
-        kingdom.treasury -= EVENT_EFFECTS.riot.treasury
-        kingdom.happiness -= EVENT_EFFECTS.riot.happiness
-        kingdom.stability -= EVENT_EFFECTS.riot.stability
-
-    elif event == "rebellion":
-        kingdom.population = int(
-            kingdom.population *
-            (1 - EVENT_EFFECTS.rebellion.population_percent)
+        kingdom.happiness += (
+            effects["happiness"] * severity
         )
+
+        kingdom.stability += (
+            effects["stability"] * severity
+        )
+
+        kingdom.population = int(
+            kingdom.population
+            * (1 + effects["population_percent"] * severity)
+        )
+
+    elif event.event_type == "riot":
+        kingdom.treasury += (
+            effects["treasury"] * severity
+        )
+
+        kingdom.happiness += (
+            effects["happiness"] * severity
+        )
+
+        kingdom.stability += (
+            effects["stability"] * severity
+        )
+
+    elif event.event_type == "rebellion":
+        kingdom.population = int(
+            kingdom.population
+            * (1 + effects["population_percent"] * severity)
+        )
+
         kingdom.army_size = int(
-            kingdom.army_size *
-            (1 - EVENT_EFFECTS.rebellion.army_size_percent)
+            kingdom.army_size
+            * (1 + effects["army_size_percent"] * severity)
         )
-        kingdom.happiness -= EVENT_EFFECTS.rebellion.happiness
-        kingdom.stability -= EVENT_EFFECTS.rebellion.stability
 
-    elif event == "market_crash":
+        kingdom.happiness += (
+            effects["happiness"] * severity
+        )
+
+        kingdom.stability += (
+            effects["stability"] * severity
+        )
+
+    elif event.event_type == "market_crash":
         kingdom.treasury = int(
-            kingdom.treasury *
-            (1 - EVENT_EFFECTS.market_crash.treasury_percent)
+            kingdom.treasury
+            * (1 + effects["treasury_percent"] * severity)
         )
-        kingdom.happiness -= EVENT_EFFECTS.market_crash.happiness
-        kingdom.stability -= EVENT_EFFECTS.market_crash.stability
 
-    elif event == "desertion":
+        kingdom.happiness += (
+            effects["happiness"] * severity
+        )
+
+        kingdom.stability += (
+            effects["stability"] * severity
+        )
+
+    elif event.event_type == "desertion":
         kingdom.army_size = int(
-            kingdom.army_size *
-            (1 - EVENT_EFFECTS.desertion.army_size_percent)
+            kingdom.army_size
+            * (1 + effects["army_size_percent"] * severity)
         )
-        kingdom.army_quality -= EVENT_EFFECTS.desertion.army_quality
-        kingdom.stability -= EVENT_EFFECTS.desertion.stability
 
+        kingdom.army_quality += (
+            effects["army_quality"] * severity
+        )
 
+        kingdom.stability += (
+            effects["stability"] * severity
+        )
 
-
-
+    kingdom.save()

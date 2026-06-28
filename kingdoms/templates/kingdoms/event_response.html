@@ -33,23 +33,23 @@
 
             <ul>
                 {% if event.population_change %}
-                    <li>Population: {{ event.population_change }}</li>
+                <li>Population: {{ event.population_change }}</li>
                 {% endif %}
 
                 {% if event.treasury_change %}
-                    <li>Treasury: {{ event.treasury_change }}</li>
+                <li>Treasury: {{ event.treasury_change }}</li>
                 {% endif %}
 
                 {% if event.happiness_change %}
-                    <li>Happiness: {{ event.happiness_change }}</li>
+                <li>Happiness: {{ event.happiness_change }}</li>
                 {% endif %}
 
                 {% if event.stability_change %}
-                    <li>Stability: {{ event.stability_change }}</li>
+                <li>Stability: {{ event.stability_change }}</li>
                 {% endif %}
 
                 {% if event.duration_turns %}
-                    <li>Expected Duration: {{ event.duration_turns }} turns</li>
+                <li>Expected Duration: {{ event.duration_turns }} turns</li>
                 {% endif %}
             </ul>
 
@@ -69,19 +69,18 @@
                         Response
                     </label>
 
-                    <textarea
-                        id="response"
-                        name="response"
-                        class="form-control"
-                        rows="10"
+                    <textarea id="response" name="response" class="form-control" rows="10"
                         placeholder="Example: I shall immediately reduce taxes, distribute grain reserves to the poorest citizens, and dispatch envoys to neighbouring kingdoms to purchase additional food supplies."
-                        required
-                    ></textarea>
+                        required></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-danger">
                     Submit Royal Decree
                 </button>
+
+                {% if error %}
+                    <p>{{ error }}</p>
+                {% endif %}
 
                 <a href="{% url 'dashboard' %}" class="btn btn-secondary">
                     Return to Dashboard
@@ -96,4 +95,3 @@
 </div>
 
 {% endblock %}
-

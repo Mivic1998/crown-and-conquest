@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.utils import timezone
 from django.utils.text import slugify
 from .forms import PolicyForm, CreateKingdomForm
 from .models import Kingdom, TurnHistory, Event
 from .simulation import process_turn
+from. events import apply_event_effects
+from .ai import evaluate_event_response, calculate_score
 from .events import EVENT_DATA
 
 # Create your views here.
@@ -61,16 +64,16 @@ def take_turn(request):
     if kingdom is None:
         return redirect("create_kingdom")
 
-    turn = process_turn(kingdom)
+    turn, event = process_turn(kingdom)
 
-    if turn.event:
-        data = EVENT_DATA.get(turn.event, {})
+    if event:
+        data = EVENT_DATA.get(turn.event_type, {})
 
         Event.objects.create(
             kingdom=kingdom,
             turn=turn,
             turn_number=turn.turn_number,
-            event_type=turn.event,
+            event_type=event,
             description=data.get("description", ""),
 
             population_change=data.get("population_change", 0),
@@ -99,8 +102,39 @@ def respond_to_event(request, event_id):
     event = get_object_or_404(
         Event,
         id=event_id,
-        kingdom=request.user.kingdom #Ensures only user to whom
+        kingdom=request.user.kingdom, 
+        is_resolved=False
     )
+
+    if request.method == "POST":
+        response = request.POST.get("response", "").strip()
+
+        if not response:
+            return render(
+                request,
+                "kingdoms/event_response.html",
+                {
+                    "event": event,
+                    "error": "You must write a royal decree.",
+                }
+            )
+
+        ai_result = evaluate_event_response(
+            event=event,
+            player_response=response,
+        )
+
+        event.player_response = response
+        event.empathy = ai_result["empathy"]
+        event.practicality = ai_result["practicality"]
+        event.leadership = ai_result["leadership"]
+        event.ai_score = calculate_score(event.empathy, event.practicality, event.leadership)
+        event.ai_feedback = ai_result["feedback"]
+        event.is_resolved = True
+        event.resolved_at = timezone.now()
+        event.is_resolved = True
+        event.save()
+        apply_event_effects(event)
 
     return render(
         request,
@@ -108,4 +142,6 @@ def respond_to_event(request, event_id):
         {"event": event}
     )
 
+def event_detail(request):
+    print
     
