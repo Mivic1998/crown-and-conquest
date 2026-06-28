@@ -9,9 +9,9 @@ from .forms import PolicyForm, CreateKingdomForm
 from .models import Kingdom, TurnHistory, Event
 from .simulation import process_turn
 from. events import apply_event_response_effects
-from .ai import evaluate_event_response, calculate_score
+from .ai import evaluate_event_response
 from .events import EVENT_EFFECTS
-from .utils import build_effect_comparison
+from .utils import build_effect_comparison, calculate_score
 
 # Create your views here.
 

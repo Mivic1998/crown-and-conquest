@@ -28,3 +28,11 @@ def build_effect_comparison(original, applied):
             })
 
     return rows
+
+def calculate_score(empathy, practicality, leadership):
+    return (
+        empathy * 0.2
+        + practicality * 0.3
+        + leadership * 0.5
+    )
+

@@ -19,10 +19,4 @@ def evaluate_event_response(event, player_response):
         "feedback": feedback,
     }
 
-def calculate_score(empathy, practicality, leadership):
-    return (
-        empathy * 0.2
-        + practicality * 0.3
-        + leadership * 0.5
-    )
 
