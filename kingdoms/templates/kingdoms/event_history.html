@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Event History</h1>
+
+{% if events %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Turn</th>
+                <th>Event</th>
+                <th>Resolved</th>
+                <th>AI Score</th>
+                <th>Date</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for event in events %}
+
+                <tr>
+
+                    <td>
+                        {{ event.turn_number }}
+                    </td>
+
+                    <td>
+                        {{ event.get_event_type_display }}
+                    </td>
+
+                    <td>
+                        {% if event.is_resolved %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if event.ai_score %}
+                            {{ event.ai_score|floatformat:1 }}/10
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ event.created_at|date:"M j, Y" }}
+                    </td>
+
+                    <td>
+
+                        {% if event.is_resolved %}
+
+                            <a href="{% url 'event_detail' event.id %}">
+                                View Report
+                            </a>
+
+                        {% else %}
+
+                            <a href="{% url 'respond_to_event' event.id %}">
+                                Respond
+                            </a>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+{% else %}
+
+    <p>No events have occurred yet.</p>
+
+{% endif %}
+
+<hr>
+
+{% if is_paginated %}
+
+    <div>
+
+        {% if page_obj.has_previous %}
+
+            <a href="?page=1">« First</a>
+
+            <a href="?page={{ page_obj.previous_page_number }}">
+                Previous
+            </a>
+
+        {% endif %}
+
+        <span>
+            Page {{ page_obj.number }}
+            of
+            {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+
+            <a href="?page={{ page_obj.next_page_number }}">
+                Next
+            </a>
+
+            <a href="?page={{ page_obj.paginator.num_pages }}">
+                Last »
+            </a>
+
+        {% endif %}
+
+    </div>
+
+{% endif %}
+
+<hr>
+
+<p>
+    <a href="{% url 'dashboard' %}">
+        Return to Dashboard
+    </a>
+</p>
+
+{% endblock %}

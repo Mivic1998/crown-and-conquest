@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.http import require_POST
+from django.views.generic import ListView
 from django.utils import timezone
 from django.utils.text import slugify
 from .forms import PolicyForm, CreateKingdomForm
@@ -144,6 +146,18 @@ def respond_to_event(request, event_id):
         {"event": event}
     )
 
+class EventHistoryListView(LoginRequiredMixin, ListView):
+    model = Event
+    template_name = "kingdoms/event_history.html"
+    context_object_name = "events"
+    paginate_by = 20
+
+    def get_queryset(self):
+        return Event.objects.filter(
+            kingdom=self.request.user.kingdom
+        ).order_by("-turn_number")
+
+@login_required
 def event_detail(request, event_id):
     event = get_object_or_404(
         Event,
@@ -174,3 +188,29 @@ def event_detail(request, event_id):
          }
     )
     
+class TurnHistoryListView(LoginRequiredMixin, ListView):
+    model = TurnHistory
+    template_name = "kingdoms/turn_history.html"
+    context_object_name = "turns"
+    paginate_by = 20
+
+    def get_queryset(self):
+        return TurnHistory.objects.filter(
+            kingdom=self.request.user.kingdom
+        ).order_by("-turn_number")
+
+
+@login_required
+def turn_detail(request, turn_id):
+    turn = get_object_or_404(
+        TurnHistory,
+        id=turn_id,
+        kingdom=request.user.kingdom, 
+    )
+    return render(
+        request,
+        "kingdoms/turn_detail.html",
+        {
+            "turn": turn
+         }
+    )
