@@ -8,7 +8,7 @@ from django.utils.text import slugify
 from .forms import PolicyForm, CreateKingdomForm
 from .models import Kingdom, TurnHistory, Event
 from .simulation import process_turn
-from. events import apply_event_effects
+from. events import apply_event_response_effects
 from .ai import evaluate_event_response, calculate_score
 from .events import EVENT_EFFECTS
 from .utils import build_effect_comparison
@@ -77,19 +77,7 @@ def take_turn(request):
             turn=turn,
             turn_number=turn.turn_number,
             event_type=event,
-            description=data.get("description", ""),
-
-            population_change=data.get("population_change", 0),
-            treasury_change=data.get("treasury", 0),
-            food_change=data.get("food", 0),
-            army_size_change=data.get("army_size", 0),
-            army_quality_change=data.get("army_quality", 0),
-            happiness_change=data.get("happiness", 0),
-            stability_change=data.get("stability", 0),
-
-            duration_turns=data.get("turns", 0),
-            food_production_modifier=data.get("production_modifier", 1.0),
-            tax_income_modifier=data.get("tax_income_modifier", 1.0),
+            description=data.get("description", "")
         )
 
     return render(
@@ -137,7 +125,7 @@ def respond_to_event(request, event_id):
         event.resolved_at = timezone.now()
         event.is_resolved = True
         event.save()
-        apply_event_effects(event)
+        apply_event_response_effects(event)
         redirect(event_detail)
 
     return render(
@@ -214,3 +202,10 @@ def turn_detail(request, turn_id):
             "turn": turn
          }
     )
+
+@login_required
+def delete_kingdom(request):
+    print
+
+def kingdom_settings(request):
+    print
