@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if was_unseen %}
+    <h1>New Event Report</h1>
+    <p>Your advisors have delivered a report regarding the recent crisis.</p>
+{% else %}
+    <h1>Event Report</h1>
+{% endif %}
+
+<hr>
+
+<h2>{{ event.get_event_type_display|default:event.event_type|title }}</h2>
+
+<p>
+    <strong>Turn:</strong>
+    {{ event.turn_number }}
+</p>
+
+<p>
+    <strong>Date Resolved:</strong>
+    {{ event.resolved_at|date:"F j, Y, g:i a" }}
+</p>
+
+<hr>
+
+<h3>Crisis Description</h3>
+<p>{{ event.description }}</p>
+
+<hr>
+
+<h3>Your Royal Decree</h3>
+<blockquote>
+    {{ event.player_response|linebreaks }}
+</blockquote>
+
+<hr>
+
+<h3>Royal Council Evaluation</h3>
+
+<ul>
+    <li><strong>Empathy:</strong> {{ event.empathy|floatformat:1 }}/10</li>
+    <li><strong>Leadership:</strong> {{ event.leadership|floatformat:1 }}/10</li>
+    <li><strong>Practicality:</strong> {{ event.practicality|floatformat:1 }}/10</li>
+    <li><strong>Overall Score:</strong> {{ event.ai_score|floatformat:1 }}/10</li>
+</ul>
+
+<h4>Council Feedback</h4>
+<p>{{ event.ai_feedback|linebreaks }}</p>
+
+<hr>
+
+<h3>Consequences</h3>
+
+{% if effect_comparison %}
+    <table>
+        <thead>
+            <tr>
+                <th>Effect</th>
+                <th>Original Impact</th>
+                <th>Final Impact</th>
+                <th>Change</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for row in effect_comparison %}
+                <tr>
+                    <td>{{ row.label }}</td>
+                    <td>{{ row.original|floatformat:2 }}</td>
+                    <td>{{ row.applied|floatformat:2 }}</td>
+                    <td>{{ row.mitigated|floatformat:2 }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No consequences were recorded for this event.</p>
+{% endif %}
+
+<hr>
+
+<p>
+    <a href="{% url 'dashboard' %}">
+        Return to Dashboard
+    </a>
+</p>
+
+<p>
+    <a href="{% url 'event_history' %}">
+        View Event History
+    </a>
+</p>
+
+{% endblock %}

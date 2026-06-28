@@ -8,7 +8,8 @@ from .models import Kingdom, TurnHistory, Event
 from .simulation import process_turn
 from. events import apply_event_effects
 from .ai import evaluate_event_response, calculate_score
-from .events import EVENT_DATA
+from .events import EVENT_EFFECTS
+from .utils import build_effect_comparison
 
 # Create your views here.
 
@@ -67,7 +68,7 @@ def take_turn(request):
     turn, event = process_turn(kingdom)
 
     if event:
-        data = EVENT_DATA.get(turn.event_type, {})
+        data = EVENT_EFFECTS.get(turn.event_type, {})
 
         Event.objects.create(
             kingdom=kingdom,
@@ -135,13 +136,41 @@ def respond_to_event(request, event_id):
         event.is_resolved = True
         event.save()
         apply_event_effects(event)
+        redirect(event_detail)
+
+    return render(
+        request,
+        "kingdoms/event_response.html",
+        {"event": event}
+    )
+
+def event_detail(request, event_id):
+    event = get_object_or_404(
+        Event,
+        id=event_id,
+        kingdom=request.user.kingdom, 
+    )
+
+    original_effects = EVENT_EFFECTS.get(event.event_type, {})
+
+    effect_comparison = build_effect_comparison(
+        original_effects,
+        event.applied_effects
+    )  
+
+    was_unseen = not event.report_seen
+
+    if not event.report_seen:
+        event.report_seen = True
+        event.save(update_fields=["report_seen"])
 
     return render(
         request,
         "kingdoms/event_detail.html",
-        {"event": event}
+        {
+            "event": event,
+            "was_unseen": was_unseen,
+            "effect_comparison": effect_comparison
+         }
     )
-
-def event_detail(request):
-    print
     

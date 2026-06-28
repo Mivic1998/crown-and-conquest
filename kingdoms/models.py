@@ -134,32 +134,27 @@ class Event(models.Model):
 
     description = models.TextField(blank=True)
 
-    # Immediate effects already applied
-    population_change = models.IntegerField(default=0)
-    treasury_change = models.FloatField(default=0)
-    food_change = models.FloatField(default=0)
-    army_size_change = models.IntegerField(default=0)
-    army_quality_change = models.FloatField(default=0)
-    happiness_change = models.FloatField(default=0)
-    stability_change = models.FloatField(default=0)
-
-    # Ongoing modifiers
-    duration_turns = models.IntegerField(default=0)
-    food_production_modifier = models.FloatField(default=1.0)
-    tax_income_modifier = models.FloatField(default=1.0)
+    applied_effects = models.JSONField(
+        default=dict,
+        blank=True
+    )
 
     # Player response flow
     is_resolved = models.BooleanField(default=False)
     report_seen = models.BooleanField(default=False)
     player_response = models.TextField(blank=True, null=True)
-    empathy = models.FloatField()
-    practicality = models.FloatField()
-    leadership = models.FloatField()
+    empathy = models.FloatField(blank=True, null=True)
+    practicality = models.FloatField(blank=True, null=True)
+    leadership = models.FloatField(blank=True, null=True)
     ai_score = models.FloatField(blank=True, null=True)
     ai_feedback = models.TextField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     resolved_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        ordering = ["turn_number"]
+        get_latest_by = "turn_number"
 
     def __str__(self):
         return f"{self.kingdom.name} - {self.event_type} - Turn {self.turn_number}"
