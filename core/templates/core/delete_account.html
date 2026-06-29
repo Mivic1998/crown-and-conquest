@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Delete Account</h1>
+
+<hr>
+
+<p>
+    You are about to permanently delete your Crown & Conquest account.
+</p>
+
+<p>
+    This action <strong>cannot be undone</strong>.
+</p>
+
+<p>
+    Deleting your account will permanently remove:
+</p>
+
+<ul>
+    <li>Your account information</li>
+    <li>Your kingdom</li>
+    <li>All turn history</li>
+    <li>All event history</li>
+    <li>All battle history</li>
+    <li>All kingdom statistics</li>
+</ul>
+
+<hr>
+
+<p>
+    To confirm account deletion, type:
+</p>
+
+<p>
+    <strong>DELETE ACCOUNT</strong>
+</p>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <div>
+        <label for="confirmation">
+            Confirmation
+        </label>
+
+        <input
+            type="text"
+            name="confirmation"
+            id="confirmation"
+            placeholder="Type DELETE ACCOUNT"
+            required
+        >
+    </div>
+
+    <br>
+
+    {% if error %}
+        <p style="color: red;">
+            {{ error }}
+        </p>
+    {% endif %}
+
+    <button type="submit">
+        Permanently Delete Account
+    </button>
+
+</form>
+
+<hr>
+
+<p>
+    <a href="{% url 'kingdom_settings' %}">
+        Cancel and Return to Settings
+    </a>
+</p>
+
+{% endblock %}

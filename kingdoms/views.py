@@ -67,6 +67,16 @@ def take_turn(request):
 
     if kingdom is None:
         return redirect("create_kingdom")
+    
+    unresolved_event = kingdom.events.filter(is_resolved=False).first()
+
+    if unresolved_event:
+        messages.warning(
+            request,
+            "You must respond to the current crisis before advancing to the next turn."
+        )
+
+        return redirect("respond_to_event", event_id=unresolved_event.id)
 
     turn, event = process_turn(kingdom)
 
@@ -233,7 +243,7 @@ def delete_kingdom(request):
 
     return render(
         request,
-        "kingdoms/delete.html",
+        "kingdoms/delete_kingdom.html",
         {
             "kingdom": kingdom_name,
             "kingdom_exists": kingdom_exists 
@@ -244,13 +254,15 @@ def delete_kingdom(request):
 def kingdom_settings(request):
 
     if not hasattr(request.user, "kingdom"):
+        
         messages.info(
             request,
             "You need to create a kingdom before accessing kingdom settings."
         )
-        kingdom = request.user.kingdom
 
         return redirect("create_kingdom")
+    
+    kingdom = request.user.kingdom
 
     if request.method == "POST":
         form = KingdomSettingsForm(

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ kingdom.name }}</h1>
+
+<p>
+    Ruled by <strong>{{ kingdom.ruler_name }}</strong>
+</p>
+
+<hr>
+
+<h2>Public Kingdom Profile</h2>
+
+<table>
+    <tr>
+        <th>Population</th>
+        <td>{{ kingdom.population }}</td>
+    </tr>
+
+    <tr>
+        <th>Army Size</th>
+        <td>{{ kingdom.army_size }}</td>
+    </tr>
+
+    <tr>
+        <th>Army Quality</th>
+        <td>{{ kingdom.army_quality|floatformat:1 }}</td>
+    </tr>
+
+    <tr>
+        <th>Territories</th>
+        <td>{{ kingdom.territory_count }}</td>
+    </tr>
+
+    <tr>
+        <th>Current Turn</th>
+        <td>{{ kingdom.turn_number }}</td>
+    </tr>
+</table>
+
+<hr>
+
+<p>
+    <a href="{% url 'leaderboard' %}">
+        Back to Leaderboard
+    </a>
+</p>
+
+{% endblock %}
