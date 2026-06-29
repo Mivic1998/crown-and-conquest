@@ -11,6 +11,6 @@ urlpatterns = [
     path("history/", views.TurnHistoryListView.as_view(), name="turn_history"),
     path("history/<int:turn_id>/", views.turn_detail, name="turn_detail"),
     path("settings/", views.kingdom_settings, name="kingdom_settings"),
-    path("delete/", views.delete_kingdom, name="delete_kingdom")
+    path("settings/delete/", views.delete_kingdom, name="delete_kingdom")
 ]
 

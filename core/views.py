@@ -1,4 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.views import generic
 from kingdoms.models import Kingdom
 
@@ -26,3 +29,48 @@ def kingdom_detail(request, slug):
             "kingdom": kingdom,
         },
     )
+
+@login_required
+def delete_account(request):
+
+    if request.method == "POST":
+
+        confirmation = request.POST.get(
+            "confirmation",
+            ""
+        ).strip()
+
+        if confirmation != "DELETE ACCOUNT":
+            return render(
+                request,
+                "core/delete_account.html",
+                {
+                    "error": (
+                        "You must type "
+                        "DELETE ACCOUNT exactly "
+                        "to confirm."
+                    )
+                }
+            )
+
+        username = request.user.username
+
+        user = request.user
+
+        logout(request)
+
+        user.delete()
+
+        messages.success(
+            request,
+            f"Farewell, {username}. "
+            "Your account has been permanently deleted."
+        )
+
+        return redirect("home")
+
+    return render(
+        request,
+        "core/delete_account.html",
+    )
+        

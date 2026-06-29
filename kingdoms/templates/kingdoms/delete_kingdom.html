@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if not kingdom_exists %}
+
+<h1>Kingdom Destroyed</h1>
+
+<p>
+    The Kingdom of <strong>{{ kingdom_name }}</strong>
+    has passed into legend.
+</p>
+
+<p>
+    You may now found a new realm.
+</p>
+
+<a href="{% url 'create_kingdom' %}">
+    Create a New Kingdom
+</a>
+
+{% else %}
+
+<h1>Destroy Kingdom</h1>
+
+<hr>
+
+<p>
+    You are about to permanently destroy the Kingdom of
+    <strong>{{ kingdom.name }}</strong>.
+</p>
+
+<p>
+    This action <strong>cannot be undone</strong>.
+</p>
+
+<p>
+    The following data will be permanently removed:
+</p>
+
+<ul>
+    <li>All turn history</li>
+    <li>All event history</li>
+    <li>All battle history</li>
+    <li>All kingdom statistics</li>
+</ul>
+
+<hr>
+
+<p>
+    To confirm, type:
+</p>
+
+<p>
+    <strong>DELETE KINGDOM</strong>
+</p>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <div>
+        <label for="confirmation">
+            Confirmation
+        </label>
+
+        <input type="text" name="confirmation" id="confirmation" placeholder="Type DELETE KINGDOM" required>
+    </div>
+
+    <br>
+
+    {% if error %}
+    <p style="color: red;">
+        {{ error }}
+    </p>
+    {% endif %}
+
+    <button type="submit">
+        Destroy Kingdom
+    </button>
+
+</form>
+
+<hr>
+
+<p>
+    <a href="{% url 'kingdom_settings' %}">
+        Cancel and Return to Settings
+    </a>
+</p>
+
+{% endif %}
+
+
+{% endblock %}

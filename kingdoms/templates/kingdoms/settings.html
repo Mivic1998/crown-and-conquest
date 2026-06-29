@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Kingdom Settings</h1>
+
+<hr>
+
+<h2>Kingdom Identity</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">
+        Save Changes
+    </button>
+</form>
+
+<hr>
+
+<h2>Account Information</h2>
+
+<ul>
+    <li>
+        <strong>Username:</strong>
+        {{ request.user.username }}
+    </li>
+
+    <li>
+        <strong>Email:</strong>
+        {{ request.user.email }}
+    </li>
+
+    <li>
+        <strong>Kingdom:</strong>
+        {{ kingdom.name }}
+    </li>
+
+    <li>
+        <strong>Ruler:</strong>
+        {{ kingdom.ruler_name }}
+    </li>
+
+    <li>
+        <strong>Current Turn:</strong>
+        {{ kingdom.turn_number }}
+    </li>
+</ul>
+
+<hr>
+
+<h2>Danger Zone</h2>
+
+<p>
+    The actions below are permanent and cannot be undone.
+</p>
+
+<h3>Delete Kingdom</h3>
+
+<p>
+    Permanently destroy your kingdom, including all turn history,
+    event history, and kingdom statistics.
+</p>
+
+<p>
+    <a href="{% url 'delete_kingdom' %}">
+        Delete Kingdom
+    </a>
+</p>
+
+<hr>
+
+<h3>Delete Account</h3>
+
+<p>
+    Permanently delete your account and all associated data,
+    including your kingdom and game history.
+</p>
+
+<p>
+    <a href="{% url 'delete_account' %}">
+        Delete Account
+    </a>
+</p>
+
+<hr>
+
+<p>
+    <a href="{% url 'dashboard' %}">
+        Return to Dashboard
+    </a>
+</p>
+
+{% endblock %}

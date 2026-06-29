@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView
 from django.utils import timezone
 from django.utils.text import slugify
-from .forms import PolicyForm, CreateKingdomForm
+from .forms import PolicyForm, CreateKingdomForm, KingdomSettingsForm
 from .models import Kingdom, TurnHistory, Event
 from .simulation import process_turn
 from. events import apply_event_response_effects
@@ -126,7 +127,7 @@ def respond_to_event(request, event_id):
         event.is_resolved = True
         event.save()
         apply_event_response_effects(event)
-        redirect(event_detail)
+        return redirect(event_detail)
 
     return render(
         request,
@@ -205,7 +206,78 @@ def turn_detail(request, turn_id):
 
 @login_required
 def delete_kingdom(request):
-    print
+    kingdom = get_object_or_404(
+        Kingdom,
+        owner=request.user,
+    )
 
+    kingdom_name = kingdom.name
+
+    kingdom_exists = True
+
+    if request.method == "POST":
+        confirmation = request.POST.get("confirmation", "").strip()
+
+        if confirmation != "DELETE KINGDOM":
+            return render(
+                request,
+                "kingdoms/delete.html",
+                {
+                    "kingdom": kingdom,
+                    "error": "You must type DELETE KINGDOM exactly to confirm.",
+                }
+            )
+
+        kingdom.delete()
+        kingdom_exists = False
+
+    return render(
+        request,
+        "kingdoms/delete.html",
+        {
+            "kingdom": kingdom_name,
+            "kingdom_exists": kingdom_exists 
+        }
+    )
+
+@login_required
 def kingdom_settings(request):
-    print
+
+    if not hasattr(request.user, "kingdom"):
+        messages.info(
+            request,
+            "You need to create a kingdom before accessing kingdom settings."
+        )
+        kingdom = request.user.kingdom
+
+        return redirect("create_kingdom")
+
+    if request.method == "POST":
+        form = KingdomSettingsForm(
+            request.POST,
+            instance=kingdom
+        )
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                "Kingdom settings updated successfully."
+            )
+
+            return redirect("kingdom_settings")
+
+    else:
+        form = KingdomSettingsForm(
+            instance=kingdom
+        )
+
+    return render(
+        request,
+        "kingdoms/settings.html",
+        {
+            "form": form,
+            "kingdom": kingdom,
+        }
+    )
