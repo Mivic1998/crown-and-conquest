@@ -7,12 +7,13 @@ from django.views.generic import ListView
 from django.utils import timezone
 from django.utils.text import slugify
 from .forms import PolicyForm, CreateKingdomForm, KingdomSettingsForm
-from .models import Kingdom, TurnHistory, Event
+from .models import Kingdom, TurnHistory, Event, TurnLimit
 from .simulation import process_turn
 from. events import apply_event_response_effects
 from .ai import evaluate_event_response
 from .events import EVENT_EFFECTS
 from .utils import build_effect_comparison, calculate_score
+from .utils import next_midnight
 
 # Create your views here.
 
@@ -23,6 +24,11 @@ def dashboard(request):
         return redirect("create_kingdom")
 
     kingdom = request.user.kingdom
+
+    turn_limit = kingdom.turn_limit
+    turn_limit.refresh_daily_turns()
+    if not turn_limit.is_cooldown_active():
+        turn_limit.cooldown_ends_at = None
 
     if request.method == "POST":
         form = PolicyForm(request.POST, instance=kingdom)
@@ -38,6 +44,7 @@ def dashboard(request):
         {
             "kingdom": kingdom,
             "form": form,
+            "turn_limit": turn_limit
         },
     )
 
@@ -54,6 +61,10 @@ def create_kingdom(request):
             kingdom.ruler_name = request.user.username
             kingdom.slug = slugify(kingdom.name)
             kingdom.save()
+            TurnLimit.objects.create(
+                kingdom=kingdom,
+                daily_reset_at=next_midnight()
+            )
             return redirect("dashboard")
     else:
         form = CreateKingdomForm()
@@ -77,8 +88,25 @@ def take_turn(request):
         )
 
         return redirect("respond_to_event", event_id=unresolved_event.id)
+    
+    turn_limit = kingdom.turn_limit
+    turn_limit.refresh_daily_turns()
+    if not turn_limit.can_take_turn():
+        if turn_limit.cooldown_active():
+            messages.warning(
+                request,
+                'You cannot take a turn at this moment, please wait until the cooldown period has expired'
+            )
+        else:
+            messages.warning(
+                request,
+                'You have no turns remaining, please try again tomorrow'
+            )    
+        return redirect('dashboard')    
 
     turn, event = process_turn(kingdom)
+
+    turn_limit.use_turn()
 
     if event:
         data = EVENT_EFFECTS.get(turn.event_type, {})

@@ -1,6 +1,24 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+<div
+    id="turn-timer"
+    data-turns-remaining="{{ turn_limit.turns_remaining_today }}"
+    data-cooldown-ends-at="{% if turn_limit.cooldown_ends_at %}{{ turn_limit.cooldown_ends_at|date:'c' }}{% endif %}"
+    data-daily-reset-at="{{ turn_limit.daily_reset_at|date:'c' }}"
+>
+    <p>
+        Turns Remaining:
+        {{ turn_limit.turns_remaining_today }}
+        /
+        {{ turn_limit.daily_turn_limit }}
+    </p>
+
+    <p id="turn-timer-message" class="turn-timer-message">
+        Next turn available in:
+        <span id="turn-countdown"></span>
+    </p>
+</div>
 <h1>{{ kingdom.name }}</h1>
 
 <h3>Ruler: {{ kingdom.ruler_name }}</h3>
@@ -36,4 +54,13 @@
     {% csrf_token %}
     <button type="submit">End Turn</button>
 </form>
+<script src="{% static 'kingdoms/js/dashboard.js' %}"></script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'kingdoma/css/dashboard.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'kingdoms/js/dashboard.js' %}"></script>
 {% endblock %}

@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
+from datetime import timedelta
+from django.utils import timezone
+from .utils import next_midnight
 
 # Create your models here.
 
@@ -50,6 +53,7 @@ class Kingdom(models.Model):
 
     # Turn system
     turn_number = models.IntegerField(default=1)
+    turns_remaining = models.IntegerField(default=3)
 
     territory_count = models.IntegerField(default = 50)
 
@@ -101,6 +105,84 @@ class TurnHistory(models.Model):
     def __str__(self):
         return f"{self.kingdom.name} - Turn {self.turn_number}"
     
+
+class TurnLimit(models.Model):
+
+    kingdom = models.OneToOneField(
+        Kingdom,
+        on_delete=models.CASCADE,
+        related_name="turn_limit"
+    )
+
+    daily_turn_limit = models.IntegerField(
+        default=3
+    )
+
+    turns_remaining_today = models.IntegerField(
+        default=3
+    )
+
+    cooldown_minutes = models.IntegerField(
+        default=120
+    )
+
+    cooldown_ends_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    daily_reset_at = models.DateTimeField()
+
+    last_turn_taken_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    def __str__(self):
+        return f"Turn limit for {self.kingdom.name}"
+
+    def cooldown_active(self):
+        return (
+            self.cooldown_ends_at is not None
+            and self.cooldown_ends_at > timezone.now()
+        )
+
+    def has_turns_remaining(self):
+        return self.turns_remaining_today > 0
+
+    def can_take_turn(self):
+        return (
+            self.has_turns_remaining()
+            and not self.cooldown_active()
+        )
+    
+    def refresh_daily_turns(self):
+        now = timezone.now()
+
+        if now >= self.daily_reset_at:
+            self.turns_remaining_today = self.daily_turn_limit
+            self.daily_reset_at = next_midnight()
+            self.save()
+
+    def use_turn(self):
+        now = timezone.now()
+
+        self.turns_remaining_today -= 1
+        self.last_turn_taken_at = now
+        self.cooldown_ends_at = now + timedelta(
+            minutes=self.cooldown_minutes
+        )
+
+        self.save()
+
 class Event(models.Model):
 
     EVENT_TYPES = [

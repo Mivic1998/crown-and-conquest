@@ -1,0 +1,7 @@
+.turn-timer-message {
+    display: none;
+}
+
+.turn-timer-message.active {
+    display: block;
+}

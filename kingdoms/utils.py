@@ -1,3 +1,20 @@
+from datetime import datetime, time, timedelta
+from django.utils import timezone
+
+def next_midnight():
+    now = timezone.localtime()
+    tomorrow = now.date() + timedelta(days=1)
+
+    midnight = datetime.combine(
+        tomorrow,
+        time.min
+    )
+
+    return timezone.make_aware(
+        midnight,
+        timezone.get_current_timezone()
+    )
+
 def build_effect_comparison(original, applied):
     rows = []
 
