@@ -1,41 +1,44 @@
 from django.db import models
+from django.utils import timezone
+from datetime import timedelta
 
 from kingdoms.models import Kingdom
 
 
 class War(models.Model):
-
     STATUS_CHOICES = [
-        ("active", "Active"),
-        ("peace_offered", "Peace Offered"),
-        ("ended", "Ended"),
+        ("pending_defender", "Pending Defender Response"),
+        ("resolved", "Resolved"),
     ]
 
     attacker = models.ForeignKey(
         Kingdom,
         on_delete=models.CASCADE,
-        related_name="wars_started"
+        related_name="wars_started",
     )
 
     defender = models.ForeignKey(
         Kingdom,
         on_delete=models.CASCADE,
-        related_name="wars_defended"
+        related_name="wars_defended",
     )
 
     status = models.CharField(
-        max_length=20,
+        max_length=30,
         choices=STATUS_CHOICES,
-        default="active"
+        default="pending_defender",
     )
 
-    declared_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    declared_at = models.DateTimeField(auto_now_add=True)
 
-    ended_at = models.DateTimeField(
+    defender_response_deadline = models.DateTimeField(
         blank=True,
-        null=True
+        null=True,
+    )
+
+    resolved_at = models.DateTimeField(
+        blank=True,
+        null=True,
     )
 
     winner = models.ForeignKey(
@@ -43,170 +46,53 @@ class War(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="wars_won"
+        related_name="wars_won",
     )
+
+    # Attacker rallying cry
+    attacker_rallying_cry = models.TextField()
+
+    attacker_leadership_score = models.FloatField(default=0)
+    attacker_inspiration_score = models.FloatField(default=0)
+    attacker_practicality_score = models.FloatField(default=0)
+    attacker_rallying_cry_modifier = models.FloatField(default=1.0)
+    attacker_rallying_cry_feedback = models.TextField(blank=True)
+
+    # Defender rallying cry
+    defender_rallying_cry = models.TextField(blank=True)
+
+    defender_leadership_score = models.FloatField(default=0)
+    defender_inspiration_score = models.FloatField(default=0)
+    defender_practicality_score = models.FloatField(default=0)
+    defender_rallying_cry_modifier = models.FloatField(default=1.0)
+    defender_rallying_cry_feedback = models.TextField(blank=True)
+
+    defender_responded_at = models.DateTimeField(
+        blank=True,
+        null=True,
+    )
+
+    defender_auto_resolved = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["-declared_at"]
 
-    def __str__(self):
+    def save(self, *args, **kwargs):
+        if not self.defender_response_deadline:
+            self.defender_response_deadline = timezone.now() + timedelta(hours=3)
+        super().save(*args, **kwargs)
+
+    @property
+    def is_pending(self):
+        return self.status == "pending_defender"
+
+    @property
+    def response_expired(self):
         return (
-            f"{self.attacker.name} vs "
-            f"{self.defender.name}"
+            self.status == "pending_defender"
+            and self.defender_response_deadline
+            and timezone.now() >= self.defender_response_deadline
         )
-    
-class WarParticipant(models.Model):
-
-    SIDE_CHOICES = [
-        ("attacker", "Attacker"),
-        ("defender", "Defender"),
-    ]
-
-    war = models.ForeignKey(
-        War,
-        on_delete=models.CASCADE,
-        related_name="participants"
-    )
-
-    kingdom = models.ForeignKey(
-        Kingdom,
-        on_delete=models.CASCADE,
-        related_name="war_participations"
-    )
-
-    side = models.CharField(
-        max_length=20,
-        choices=SIDE_CHOICES
-    )
-
-    troops_committed = models.IntegerField(
-        default=0
-    )
-
-    starting_army_quality = models.FloatField()
-
-    joined_at = models.DateTimeField(
-        auto_now_add=True
-    )
-
-    class Meta:
-        unique_together = ("war", "kingdom")
 
     def __str__(self):
-        return (
-            f"{self.kingdom.name} "
-            f"({self.side})"
-        )
-    
-class Battle(models.Model):
-
-    OUTCOME_CHOICES = [
-        ("attacker_victory", "Attacker Victory"),
-        ("defender_victory", "Defender Victory"),
-        ("draw", "Draw"),
-    ]
-
-    war = models.ForeignKey(
-        War,
-        on_delete=models.CASCADE,
-        related_name="battles"
-    )
-
-    attacker = models.ForeignKey(
-        Kingdom,
-        on_delete=models.CASCADE,
-        related_name="attacking_battles"
-    )
-
-    defender = models.ForeignKey(
-        Kingdom,
-        on_delete=models.CASCADE,
-        related_name="defending_battles"
-    )
-
-    attacker_losses = models.IntegerField(
-        default=0
-    )
-
-    defender_losses = models.IntegerField(
-        default=0
-    )
-
-    outcome = models.CharField(
-        max_length=30,
-        choices=OUTCOME_CHOICES
-    )
-
-    battle_log = models.JSONField(
-        default=dict,
-        blank=True
-    )
-
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
-
-    class Meta:
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return (
-            f"Battle in War #{self.war.id}"
-        )
-    
-class PeaceOffer(models.Model):
-
-    STATUS_CHOICES = [
-        ("pending", "Pending"),
-        ("accepted", "Accepted"),
-        ("rejected", "Rejected"),
-        ("withdrawn", "Withdrawn"),
-    ]
-
-    war = models.ForeignKey(
-        War,
-        on_delete=models.CASCADE,
-        related_name="peace_offers"
-    )
-
-    offered_by = models.ForeignKey(
-        Kingdom,
-        on_delete=models.CASCADE,
-        related_name="peace_offers_sent"
-    )
-
-    offered_to = models.ForeignKey(
-        Kingdom,
-        on_delete=models.CASCADE,
-        related_name="peace_offers_received"
-    )
-
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default="pending"
-    )
-
-    terms = models.JSONField(
-        default=dict,
-        blank=True
-    )
-
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
-
-    responded_at = models.DateTimeField(
-        blank=True,
-        null=True
-    )
-
-    class Meta:
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return (
-            f"Peace Offer: "
-            f"{self.offered_by.name} → "
-            f"{self.offered_to.name}"
-        )
+        return f"{self.attacker.name} vs {self.defender.name}"

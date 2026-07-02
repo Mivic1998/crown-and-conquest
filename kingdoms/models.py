@@ -55,12 +55,44 @@ class Kingdom(models.Model):
     turn_number = models.IntegerField(default=1)
     turns_remaining = models.IntegerField(default=3)
 
+    # kingdoms/models.py
+
+    battle_momentum = models.FloatField(default=0.0)
+    prestige = models.FloatField(default=0.0)
+    wars_won = models.PositiveIntegerField(default=0)
+    wars_lost = models.PositiveIntegerField(default=0)
+
     territory_count = models.IntegerField(default = 50)
 
     # Metadata
+    last_active_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # War availability
+    war_available_until = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    def refresh_war_availability(self, hours=6):
+        now = timezone.now()
+
+        self.last_active_at = now
+        self.war_available_until = now + timedelta(hours=hours)
+
+        self.save(update_fields=[
+            "last_active_at",
+            "war_available_until",
+        ])
+
+
+    def is_available_for_war(self):
+        return (
+            self.war_available_until is not None
+            and self.war_available_until > timezone.now()
+        )
+   
     def __str__(self):
         return self.name
 

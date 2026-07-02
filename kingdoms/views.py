@@ -25,6 +25,8 @@ def dashboard(request):
 
     kingdom = request.user.kingdom
 
+    kingdom.refresh_war_availability()
+
     unresolved_event = kingdom.events.filter(
         is_resolved=False
     ).first()
@@ -106,6 +108,8 @@ def take_turn(request):
     if kingdom is None:
         return redirect("create_kingdom")
     
+    kingdom.refresh_war_availability()
+    
     turn_limit = kingdom.turn_limit
     turn_limit.refresh_daily_turns()
     if not turn_limit.can_take_turn():
@@ -153,6 +157,10 @@ def respond_to_event(request, event_id):
         is_resolved=False
     )
 
+    kingdom = request.user.kingdom
+    kingdom.refresh_war_availability()
+    
+
     if request.method == "POST":
         response = request.POST.get("response", "").strip()
 
@@ -183,7 +191,7 @@ def respond_to_event(request, event_id):
         event.save()
         apply_event_response_effects(event)
         return redirect("event_detail", event_id=event.id)
-
+    
     return render(
         request,
         "kingdoms/event_response.html",
@@ -222,6 +230,9 @@ def event_detail(request, event_id):
         event.report_seen = True
         event.save(update_fields=["report_seen"])
 
+    kingdom = request.user.kingdom
+    kingdom.refresh_war_availability()
+
     return render(
         request,
         "kingdoms/event_detail.html",
@@ -255,6 +266,9 @@ def turn_detail(request, turn_id):
     was_unseen = not turn.report_seen
     turn.report_seen = True
     turn.save(update_fields=["report_seen"])
+
+    kingdom = request.user.kingdom
+    kingdom.refresh_war_availability()
 
     return render(
         request,
@@ -363,6 +377,7 @@ def kingdom_statistics(request):
         "happiness": [turn.happiness for turn in turns],
         "stability": [turn.stability for turn in turns],
     }
+    kingdom.refresh_war_availability()
 
     return render(
         request,
