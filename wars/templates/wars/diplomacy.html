@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Diplomacy{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <h1>Diplomacy</h1>
+        <p class="text-muted">
+            Survey neighbouring kingdoms and choose a worthy opponent.
+            Only kingdoms that are currently active and within a reasonable military strength
+            may be challenged.
+        </p>
+    </div>
+
+    {% if kingdoms %}
+
+        <div class="row g-4">
+
+            {% for kingdom in kingdoms %}
+
+                <div class="col-lg-6">
+
+                    <div class="card shadow-sm h-100">
+
+                        <div class="card-header">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <div>
+                                    <h4 class="mb-0">
+                                        {{ kingdom.name }}
+                                    </h4>
+
+                                    <small class="text-muted">
+                                        Ruled by {{ kingdom.ruler_name }}
+                                    </small>
+                                </div>
+
+                                <span class="badge bg-success">
+                                    Available
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="row">
+
+                                <div class="col-6">
+
+                                    <h6>Military</h6>
+
+                                    <ul class="list-unstyled">
+
+                                        <li>
+                                            <strong>Army Size:</strong>
+                                            {{ kingdom.army_size }}
+                                        </li>
+
+                                        <li>
+                                            <strong>Army Quality:</strong>
+                                            {{ kingdom.army_quality|floatformat:2 }}
+                                        </li>
+
+                                    </ul>
+
+                                </div>
+
+                                <div class="col-6">
+
+                                    <h6>War Record</h6>
+
+                                    <ul class="list-unstyled">
+
+                                        <li>
+                                            <strong>Victories:</strong>
+                                            {{ kingdom.wars_won }}
+                                        </li>
+
+                                        <li>
+                                            <strong>Defeats:</strong>
+                                            {{ kingdom.wars_lost }}
+                                        </li>
+
+                                    </ul>
+
+                                </div>
+
+                            </div>
+
+                            <hr>
+
+                            <h6>Intelligence Report</h6>
+
+                            <p class="text-muted mb-0">
+
+                                Scouts estimate this kingdom possesses
+                                approximately <strong>{{ kingdom.army_size }}</strong>
+                                soldiers of
+                                <strong>{{ kingdom.army_quality|floatformat:2 }}</strong>
+                                quality.
+
+                                Their recent military history suggests they are
+                                an opponent worthy of consideration.
+
+                            </p>
+
+                        </div>
+
+                        <div class="card-footer bg-white">
+
+                            <div class="d-flex justify-content-between">
+
+                                <a
+                                    href="{% url 'public_kingdom' kingdom.slug %}"
+                                    class="btn btn-outline-secondary"
+                                >
+                                    View Kingdom
+                                </a>
+
+                                <a
+                                    href="{% url 'wars:declare_war' kingdom.slug %}"
+                                    class="btn btn-danger"
+                                >
+                                    Declare War
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="card">
+
+            <div class="card-body text-center py-5">
+
+                <h3>No Eligible Kingdoms</h3>
+
+                <p class="text-muted">
+
+                    There are currently no kingdoms available for war.
+
+                    This may be because nearby rulers are inactive,
+                    protected by cooldowns,
+                    or outside your acceptable military range.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
