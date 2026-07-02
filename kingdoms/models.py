@@ -96,6 +96,7 @@ class TurnHistory(models.Model):
 
     tax_rate = models.FloatField()
 
+    report_seen = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:

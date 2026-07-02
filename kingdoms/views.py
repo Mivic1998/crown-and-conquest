@@ -25,10 +25,29 @@ def dashboard(request):
 
     kingdom = request.user.kingdom
 
+    unresolved_event = kingdom.events.filter(
+        is_resolved=False
+    ).first()
+
     turn_limit = kingdom.turn_limit
     turn_limit.refresh_daily_turns()
-    if not turn_limit.is_cooldown_active():
+    if not turn_limit.cooldown_active():
         turn_limit.cooldown_ends_at = None
+ 
+    turn_blocked = False
+    turn_blocked_reason = ""
+
+    if unresolved_event:
+        turn_blocked = True
+        turn_blocked_reason = "You must respond to the current crisis before advancing."
+
+    elif not turn_limit.can_take_turn():
+        turn_blocked = True
+
+        if turn_limit.cooldown_active():
+            turn_blocked_reason = "You must wait for the turn cooldown to expire."
+        else:
+            turn_blocked_reason = "You have no turns remaining today."
 
     if request.method == "POST":
         form = PolicyForm(request.POST, instance=kingdom)
@@ -44,7 +63,10 @@ def dashboard(request):
         {
             "kingdom": kingdom,
             "form": form,
-            "turn_limit": turn_limit
+            "turn_limit": turn_limit,
+            "turn_blocked": turn_blocked,
+            "turn_blocked_reason": turn_blocked_reason,
+            "unresolved_event": unresolved_event,
         },
     )
 
@@ -79,16 +101,6 @@ def take_turn(request):
     if kingdom is None:
         return redirect("create_kingdom")
     
-    unresolved_event = kingdom.events.filter(is_resolved=False).first()
-
-    if unresolved_event:
-        messages.warning(
-            request,
-            "You must respond to the current crisis before advancing to the next turn."
-        )
-
-        return redirect("respond_to_event", event_id=unresolved_event.id)
-    
     turn_limit = kingdom.turn_limit
     turn_limit.refresh_daily_turns()
     if not turn_limit.can_take_turn():
@@ -109,7 +121,7 @@ def take_turn(request):
     turn_limit.use_turn()
 
     if event:
-        data = EVENT_EFFECTS.get(turn.event_type, {})
+        data = EVENT_EFFECTS.get(event, {})
 
         Event.objects.create(
             kingdom=kingdom,
@@ -165,7 +177,7 @@ def respond_to_event(request, event_id):
         event.is_resolved = True
         event.save()
         apply_event_response_effects(event)
-        return redirect(event_detail)
+        return redirect("event_detail", event_id=event.id)
 
     return render(
         request,
@@ -234,11 +246,17 @@ def turn_detail(request, turn_id):
         id=turn_id,
         kingdom=request.user.kingdom, 
     )
+
+    was_unseen = not turn.report_seen
+    turn.report_seen = True
+    turn.save(update_fields=["report_seen"])
+
     return render(
         request,
         "kingdoms/turn_detail.html",
         {
-            "turn": turn
+            "turn": turn,
+            "was_unseen": was_unseen
          }
     )
 
@@ -259,7 +277,7 @@ def delete_kingdom(request):
         if confirmation != "DELETE KINGDOM":
             return render(
                 request,
-                "kingdoms/delete.html",
+                "kingdoms/delete_kingdom.html",
                 {
                     "kingdom": kingdom,
                     "error": "You must type DELETE KINGDOM exactly to confirm.",

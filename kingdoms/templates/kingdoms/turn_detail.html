@@ -2,59 +2,46 @@
 
 {% block content %}
 
-<h1>Turn {{ turn.turn_number }} Report</h1>
+{% if was_unseen %}
+    <h1>New Turn Report</h1>
+    <p>Your advisors have delivered the latest report on your kingdom.</p>
+{% else %}
+    <h1>Turn Report</h1>
+{% endif %}
 
 <hr>
 
-<h2>Kingdom Overview</h2>
+<h2>Turn {{ turn.turn_number }}</h2>
+
+<hr>
+
+<h3>Kingdom State</h3>
 
 <table>
     <tr>
         <th>Population</th>
         <td>{{ turn.population }}</td>
     </tr>
-
     <tr>
         <th>Treasury</th>
         <td>{{ turn.treasury|floatformat:0 }}</td>
     </tr>
-
     <tr>
-        <th>Food Stores</th>
+        <th>Food</th>
         <td>{{ turn.food|floatformat:0 }}</td>
     </tr>
-
     <tr>
         <th>Happiness</th>
         <td>{{ turn.happiness|floatformat:1 }}</td>
     </tr>
-
     <tr>
         <th>Stability</th>
         <td>{{ turn.stability|floatformat:1 }}</td>
     </tr>
-
-    <tr>
-        <th>Agricultural Efficiency</th>
-        <td>{{ turn.a_eff|floatformat:2 }}</td>
-    </tr>
-
-    <tr>
-        <th>Infrastructure</th>
-        <td>{{ turn.infra|floatformat:2 }}</td>
-    </tr>
-</table>
-
-<hr>
-
-<h2>Military</h2>
-
-<table>
     <tr>
         <th>Army Size</th>
         <td>{{ turn.army_size }}</td>
     </tr>
-
     <tr>
         <th>Army Quality</th>
         <td>{{ turn.army_quality|floatformat:1 }}</td>
@@ -63,57 +50,52 @@
 
 <hr>
 
-<h2>Policies in Effect</h2>
+<h3>Policies</h3>
 
 <table>
     <tr>
         <th>Tax Rate</th>
-        <td>{{ turn.tax_rate }}%</td>
+        <td>{{ turn.tax_rate }}</td>
     </tr>
-
     <tr>
-        <th>Agricultural Investment</th>
-        <td>{{ turn.agriculture_investment }}%</td>
+        <th>Agriculture Investment</th>
+        <td>{{ turn.agriculture_investment }}</td>
     </tr>
-
     <tr>
         <th>Infrastructure Investment</th>
-        <td>{{ turn.infrastructure_investment }}%</td>
+        <td>{{ turn.infrastructure_investment }}</td>
     </tr>
-
     <tr>
         <th>Military Investment</th>
-        <td>{{ turn.military_investment }}%</td>
+        <td>{{ turn.military_investment }}</td>
     </tr>
-
     <tr>
         <th>Welfare Investment</th>
-        <td>{{ turn.welfare_investment }}%</td>
+        <td>{{ turn.welfare_investment }}</td>
     </tr>
 </table>
 
 <hr>
 
-<h2>Event</h2>
+<h3>Event</h3>
 
 {% if turn.event %}
-
     <p>
-        During this turn, a
-        <strong>{{ turn.event.get_event_type_display }}</strong>
-        occurred.
+        This turn triggered a
+        <strong>{{ turn.event.get_event_type_display }}</strong>.
     </p>
 
-    <p>
+    {% if turn.event.is_resolved %}
         <a href="{% url 'event_detail' turn.event.id %}">
             View Event Report
         </a>
-    </p>
-
+    {% else %}
+        <a href="{% url 'respond_to_event' turn.event.id %}">
+            Respond to Event
+        </a>
+    {% endif %}
 {% else %}
-
-    <p>No major events occurred during this turn.</p>
-
+    <p>No major event occurred this turn.</p>
 {% endif %}
 
 <hr>
