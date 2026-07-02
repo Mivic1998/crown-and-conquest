@@ -339,3 +339,32 @@ def kingdom_settings(request):
             "kingdom": kingdom,
         }
     )
+
+@login_required
+def kingdom_statistics(request):
+    if not hasattr(request.user, "kingdom"):
+        messages.info(
+            request,
+            "You need to create a kingdom before accessing kingdom statistics."
+        )
+        return redirect("create_kingdom")
+    kingdom = request.user.kingdom
+    turns = kingdom.turn_history.order_by("turn_number")
+    chart_data = {
+        "labels": [turn.turn_number for turn in turns],
+        "population": [turn.population for turn in turns],
+        "treasury": [turn.treasury for turn in turns],
+        "food": [turn.food for turn in turns],
+        "happiness": [turn.happiness for turn in turns],
+        "stability": [turn.stability for turn in turns],
+    }
+
+    return render(
+        request,
+        "kingdoms/statistics.html",
+        {
+            "kingdom": kingdom,
+            "turn_history": turns,
+            "chart_data": chart_data,
+        }
+    )

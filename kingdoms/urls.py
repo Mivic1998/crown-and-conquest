@@ -10,6 +10,7 @@ urlpatterns = [
     path("events/<int:event_id>/", views.event_detail, name="event_detail"),
     path("history/", views.TurnHistoryListView.as_view(), name="turn_history"),
     path("history/<int:turn_id>/", views.turn_detail, name="turn_detail"),
+    path("statistics", views.kingdom_statistics, name="kingdom_statistics"),
     path("settings/", views.kingdom_settings, name="kingdom_settings"),
     path("settings/delete/", views.delete_kingdom, name="delete_kingdom")
 ]

@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'kingdoms/css/statistics.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h1>Kingdom Statistics</h1>
+
+<p>
+    Historical development of the Kingdom of
+    <strong>{{ kingdom.name }}</strong>.
+</p>
+
+<hr>
+
+<h2>Current Kingdom Summary</h2>
+
+<table>
+    <tr>
+        <th>Current Turn</th>
+        <td>{{ kingdom.turn_number }}</td>
+    </tr>
+
+    <tr>
+        <th>Population</th>
+        <td>{{ kingdom.population }}</td>
+    </tr>
+
+    <tr>
+        <th>Treasury</th>
+        <td>{{ kingdom.treasury|floatformat:0 }}</td>
+    </tr>
+
+    <tr>
+        <th>Food</th>
+        <td>{{ kingdom.food|floatformat:0 }}</td>
+    </tr>
+
+    <tr>
+        <th>Happiness</th>
+        <td>{{ kingdom.happiness|floatformat:1 }}</td>
+    </tr>
+
+    <tr>
+        <th>Stability</th>
+        <td>{{ kingdom.stability|floatformat:1 }}</td>
+    </tr>
+
+    <tr>
+        <th>Army Size</th>
+        <td>{{ kingdom.army_size }}</td>
+    </tr>
+
+    <tr>
+        <th>Army Quality</th>
+        <td>{{ kingdom.army_quality|floatformat:1 }}</td>
+    </tr>
+</table>
+
+<hr>
+
+{% if turn_history|length >= 2 %}
+
+    <h2>Historical Trends</h2>
+
+    <div class="statistics-chart">
+        <canvas id="population"></canvas>
+    </div>
+
+    <div class="statistics-chart">
+        <canvas id="treasury"></canvas>
+    </div>
+
+    <div class="statistics-chart">
+        <canvas id="food"></canvas>
+    </div>
+
+    <div class="statistics-chart">
+        <canvas id="happiness"></canvas>
+    </div>
+
+    <div class="statistics-chart">
+        <canvas id="stability"></canvas>
+    </div>
+
+{% else %}
+
+    <h2>Historical Trends</h2>
+
+    <p>
+        Play at least two turns to unlock kingdom trend charts.
+    </p>
+
+{% endif %}
+
+<hr>
+
+<h2>Historical Records</h2>
+
+{% if turn_history %}
+
+<table>
+
+    <thead>
+        <tr>
+            <th>Turn</th>
+            <th>Population</th>
+            <th>Treasury</th>
+            <th>Food</th>
+            <th>Happiness</th>
+            <th>Stability</th>
+            <th>Army</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for turn in turn_history %}
+
+        <tr>
+            <td>{{ turn.turn_number }}</td>
+            <td>{{ turn.population }}</td>
+            <td>{{ turn.treasury|floatformat:0 }}</td>
+            <td>{{ turn.food|floatformat:0 }}</td>
+            <td>{{ turn.happiness|floatformat:1 }}</td>
+            <td>{{ turn.stability|floatformat:1 }}</td>
+            <td>{{ turn.army_size }}</td>
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% else %}
+
+<p>
+    Your kingdom has not yet accumulated enough history to generate statistics.
+</p>
+
+{% endif %}
+
+<hr>
+
+<p>
+    <a href="{% url 'dashboard' %}">
+        Return to Dashboard
+    </a>
+</p>
+
+{% endblock %}
+
+{% block extra_js %}
+
+{{ chart_data|json_script:"chart-data" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="{% static 'kingdoms/js/statistics.js' %}"></script>
+
+{% endblock %}
