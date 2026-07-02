@@ -1,7 +1,65 @@
-{% if messages %}
-    {% for message in messages %}
-        <div class="message {{ message.tags }}">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+            Crown & Conquest
+        {% endblock %}
+    </title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    {% block extra_css %}
+    {% endblock %}
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <a href="{% url 'home' %}">Crown & Conquest</a>
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'turn_history' %}">Turn History</a>
+                <a href="{% url 'event_history' %}">Event History</a>
+                <a href="{% url 'statistics' %}">Statistics</a>
+                <a href="{% url 'kingdom_settings' %}">Settings</a>
+                <a href="{% url 'account_logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'leaderboard' %}">Leaderboard</a>
+                <a href="{% url 'account_login' %}">Login</a>
+                <a href="{% url 'account_signup' %}">Register</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+
+        {% if messages %}
+            <section class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </section>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+    {% block extra_js %}
+    {% endblock %}
+
+</body>
+
+</html>

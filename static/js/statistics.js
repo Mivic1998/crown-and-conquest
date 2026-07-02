@@ -1,4 +1,4 @@
-const charts = document.querySelectorAll(".statistics-chart");
+const charts = document.querySelectorAll(".statistics-chart canvas");
 
 const chartData = JSON.parse(
     document.getElementById("chart-data").textContent

@@ -29,6 +29,10 @@ def dashboard(request):
         is_resolved=False
     ).first()
 
+    unseen_turns = kingdom.history.filter(
+        report_seen=False
+    ).all()
+
     turn_limit = kingdom.turn_limit
     turn_limit.refresh_daily_turns()
     if not turn_limit.cooldown_active():
@@ -66,6 +70,7 @@ def dashboard(request):
             "turn_limit": turn_limit,
             "turn_blocked": turn_blocked,
             "turn_blocked_reason": turn_blocked_reason,
+            "unseen_turns": unseen_turns,
             "unresolved_event": unresolved_event,
         },
     )
@@ -349,7 +354,7 @@ def kingdom_statistics(request):
         )
         return redirect("create_kingdom")
     kingdom = request.user.kingdom
-    turns = kingdom.turn_history.order_by("turn_number")
+    turns = kingdom.history.order_by("turn_number")
     chart_data = {
         "labels": [turn.turn_number for turn in turns],
         "population": [turn.population for turn in turns],
@@ -364,7 +369,7 @@ def kingdom_statistics(request):
         "kingdoms/statistics.html",
         {
             "kingdom": kingdom,
-            "turn_history": turns,
+            "history": turns,
             "chart_data": chart_data,
         }
     )

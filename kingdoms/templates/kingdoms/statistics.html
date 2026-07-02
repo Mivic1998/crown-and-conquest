@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'kingdoms/css/statistics.css' %}">
+<link rel="stylesheet" href="{% static 'css/statistics.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -62,7 +62,7 @@
 
 <hr>
 
-{% if turn_history|length >= 2 %}
+{% if history|length >= 2 %}
 
     <h2>Historical Trends</h2>
 
@@ -100,7 +100,7 @@
 
 <h2>Historical Records</h2>
 
-{% if turn_history %}
+{% if history %}
 
 <table>
 
@@ -118,7 +118,7 @@
 
     <tbody>
 
-        {% for turn in turn_history %}
+        {% for turn in history %}
 
         <tr>
             <td>{{ turn.turn_number }}</td>
@@ -160,6 +160,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script src="{% static 'kingdoms/js/statistics.js' %}"></script>
+<script src="{% static 'js/statistics.js' %}"></script>
 
 {% endblock %}
