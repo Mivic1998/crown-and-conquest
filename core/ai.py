@@ -63,7 +63,7 @@ Rallying cry:
             raise ValueError("Gemini API key is not configured")
 
         response = client.models.generate_content(
-            model=getattr(settings, "GEMINI_MODEL", None) or "gemini-1.5-flash",
+            model=getattr(settings, "GEMINI_MODEL", None) or "gemini-2.5-flash",
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -160,7 +160,7 @@ feedback
             raise ValueError("Gemini API key is not configured")
 
         response = client.models.generate_content(
-            model=getattr(settings, "GEMINI_MODEL", None) or "gemini-1.5-flash",
+            model=getattr(settings, "GEMINI_MODEL", None) or "gemini-2.5-flash",
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -303,7 +303,7 @@ Do not give exact numbers or formulas.
             raise ValueError("Gemini API key is not configured")
 
         response = client.models.generate_content(
-            model=getattr(settings, "GEMINI_MODEL", None) or "gemini-1.5-flash",
+            model=getattr(settings, "GEMINI_MODEL", None) or "gemini-2.5-flash",
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
