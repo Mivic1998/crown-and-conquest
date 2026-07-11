@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="campaign-start split-hero">
+    <div class="split-art">
+        <img src="{% static 'images/castle-overlooking-medieval-village.png' %}" alt="Castle overlooking a medieval village">
+    </div>
+    <div class="split-copy parchment-panel">
+        <p class="eyebrow">Found a new dynasty</p>
+        <h1>Create Kingdom</h1>
+        <p>Name your realm and ruler. This is the first page of your chronicle.</p>
+        <form method="POST" class="embedded-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Create Kingdom</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

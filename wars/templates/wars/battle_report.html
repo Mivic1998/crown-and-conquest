@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if was_unseen %}
+        New Battle Report
+    {% else %}
+        Battle Report
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<section class="immersive-hero compact-hero war-hero" style="--hero-image: url('{% static 'images/war-history-two.png' %}');">
+    <div class="hero-content"><p class="eyebrow">Field dispatch</p><h1>Battle Report</h1></div>
+</section>
+
+
+<div class="container battle-report-shell">
+
+    
+
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                {% if battle.outcome == "attacker_victory" %}
+                    {{ war.attacker.name }} Victorious
+                {% elif battle.outcome == "defender_victory" %}
+                    {{ war.defender.name }} Victorious
+                {% else %}
+                    Battle Ended in a Draw
+                {% endif %}
+            </h2>
+        </div>
+
+        <div class="card-body">
+            <p><strong>Battle Narrative:</strong></p>
+            <p>{{ battle.battle_report|linebreaks }}</p>
+        </div>
+    </div>
+
+    <h2 style="margin-top: 2.5rem; margin-bottom: 0.75rem;">Military Forces and Leadership</h2>
+    <p style="color: #5c655f; margin-bottom: 1.5rem;">
+        Below are the records of each kingdom’s military engagement, including casualty counts,
+        the rallying cries that inspired the troops, and the council’s assessment of leadership quality.
+    </p>
+
+    <div class="battle-board">
+
+        <div class="card battle-side-card">
+            <div class="card-header">
+                <h3>{{ war.attacker.name }}</h3>
+            </div>
+
+            <div class="card-body">
+                <div class="battle-metric-list">
+                    <p><strong>Losses:</strong> {{ battle.attacker_losses }}</p>
+                    <p><strong>Remaining Army:</strong> {{ war.attacker.army_size }}</p>
+                </div>
+
+                <h4 class="battle-subsection-title">Rallying Cry</h4>
+                <blockquote>
+                    "{{ war.attacker_rallying_cry }}"
+                </blockquote>
+
+                <h4 class="battle-subsection-title">Rally Assessment</h4>
+                <div class="battle-metric-list">
+                    <p><strong>Leadership:</strong> {{ war.attacker_leadership_score }}</p>
+                    <p><strong>Inspiration:</strong> {{ war.attacker_inspiration_score }}</p>
+                    <p><strong>Practicality:</strong> {{ war.attacker_practicality_score }}</p>
+                </div>
+                <p>{{ war.attacker_ai_feedback }}</p>
+            </div>
+        </div>
+
+        <div class="card battle-side-card mt-5">
+            <div class="card-header">
+                <h3>{{ war.defender.name }}</h3>
+            </div>
+
+            <div class="card-body">
+                <div class="battle-metric-list">
+                    <p><strong>Losses:</strong> {{ battle.defender_losses }}</p>
+                    <p><strong>Remaining Army:</strong> {{ war.defender.army_size }}</p>
+                </div>
+
+                <h4 class="battle-subsection-title">Rallying Cry</h4>
+
+                {% if war.defender_auto_resolved %}
+                    <p class="text-muted">
+                        The defender failed to answer before the deadline, and the field was left to fate.
+                    </p>
+                {% else %}
+                    <blockquote>
+                        "{{ war.defender_rallying_cry }}"
+                    </blockquote>
+                {% endif %}
+
+                <h4 class="battle-subsection-title">Rally Assessment</h4>
+                <div class="battle-metric-list">
+                    <p><strong>Leadership:</strong> {{ war.defender_leadership_score }}</p>
+                    <p><strong>Inspiration:</strong> {{ war.defender_inspiration_score }}</p>
+                    <p><strong>Practicality:</strong> {{ war.defender_practicality_score }}</p>
+                </div>
+                <p>{{ war.defender_ai_feedback }}</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="action-row mt-5">
+        <a href="{% url 'wars:war_list' %}" class="btn btn-primary">
+            Back to War History
+        </a>
+
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+            Return to Dashboard
+        </a>
+
+        <a href="{% url 'wars:diplomacy' %}" class="btn btn-outline-danger">
+            Diplomacy
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

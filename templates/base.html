@@ -1,0 +1,249 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+        Crown & Conquest
+        {% endblock %}
+    </title>
+
+    <link rel="icon" type="image/png" href="{% static 'images/favicon' %}">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    {% block extra_css %}
+    {% endblock %}
+</head>
+
+<body>
+
+    <header class="site-header">
+        <nav class="navbar navbar-expand-xxl royal-navbar" aria-label="Primary navigation">
+            <div class="container-fluid royal-navbar-inner">
+                <a class="navbar-brand royal-brand" href="{% url 'home' %}">
+                    <img src="{% static 'images/logos/alternate-logo-one.png' %}" alt="Crown & Conquest crest"
+                        class="royal-brand-mark">
+                    <span>Crown &amp; Conquest</span>
+                </a>
+
+                <button class="navbar-toggler royal-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#primaryNavigation" aria-controls="primaryNavigation" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="primaryNavigation">
+
+                    <ul class="navbar-nav royal-nav ms-auto">
+
+                        {% if user.is_authenticated %}
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                                href="{% url 'dashboard' %}">
+                                Dashboard
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'diplomacy' %}active{% endif %}"
+                                href="{% url 'wars:diplomacy' %}">
+                                Diplomacy
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'war_list' %}active{% endif %}"
+                                href="{% url 'wars:war_list' %}">
+                                War History
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'turn_history' %}active{% endif %}"
+                                href="{% url 'turn_history' %}">
+                                Turn History
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'event_history' %}active{% endif %}"
+                                href="{% url 'event_history' %}">
+                                Events
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'kingdom_statistics' %}active{% endif %}"
+                                href="{% url 'kingdom_statistics' %}">
+                                Statistics
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link premium-link {% if request.resolver_match.url_name == 'pricing' %}active{% endif %}"
+                                href="{% url 'payments:pricing' %}">
+                                {% if user.kingdom and user.kingdom.is_premium %}
+                                Premium
+                                {% else %}
+                                Upgrade
+                                {% endif %}
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'kingdom_settings' %}active{% endif %}"
+                                href="{% url 'kingdom_settings' %}">
+                                Settings
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'account_logout' %}active{% endif %}"
+                                href="{% url 'account_logout' %}">
+                                Logout
+                            </a>
+                        </li>
+
+                        {% else %}
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                                href="{% url 'home' %}">
+                                Home
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}"
+                                href="{% url 'leaderboard' %}">
+                                Leaderboard
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'mechanics' %}active{% endif %}"
+                                href="{% url 'mechanics' %}">
+                                How It Works
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link premium-link {% if request.resolver_match.url_name == 'pricing' %}active{% endif %}"
+                                href="{% url 'payments:pricing' %}">
+                                Premium
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'account_login' %}active{% endif %}"
+                                href="{% url 'account_login' %}">
+                                Login
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-cta {% if request.resolver_match.url_name == 'account_signup' %}active{% endif %}"
+                                href="{% url 'account_signup' %}">
+                                Begin
+                            </a>
+                        </li>
+
+                        {% endif %}
+
+                    </ul>
+
+                </div>
+
+        </nav>
+    </header>
+
+
+    <main>
+        {% if messages %}
+        <section class="messages" aria-label="Messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <section class="footer-brand-block" aria-label="Crown & Conquest">
+                <img src="{% static 'images/logos/alternate-logo-one.png' %}" alt="" class="footer-mark"
+                    aria-hidden="true">
+                <div>
+                    <p class="footer-title">Crown &amp; Conquest</p>
+                    <p>Lead with wisdom. Conquer with honour.</p>
+                    <p>Your legacy begins now.</p>
+                </div>
+            </section>
+
+            <section class="footer-column" aria-label="Navigation">
+                <h2>Navigation</h2>
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'wars:diplomacy' %}">Diplomacy</a>
+                <a href="{% url 'wars:war_list' %}">War History</a>
+                <a href="{% url 'turn_history' %}">Turn History</a>
+                <a href="{% url 'mechanics' %}">How It Works</a>
+            </section>
+
+            <section class="footer-column" aria-label="Community">
+                <h2>Community</h2>
+                <a href="{% url 'event_history' %}">Events</a>
+                <a href="{% url 'kingdom_statistics' %}">Statistics</a>
+                <a href="{% url 'leaderboard' %}">Leaderboard</a>
+            </section>
+
+            <section class="footer-column footer-connect" aria-label="Connect">
+                <h2>Connect</h2>
+                <p>Join our community and receive news &amp; updates.</p>
+                <div class="footer-socials" aria-hidden="true">
+                    <span>◎</span><span>☽</span><span>✉</span>
+                </div>
+            </section>
+        </div>
+        <div class="footer-lower">
+            <span>© 2025 Crown &amp; Conquest. All rights reserved.</span>
+            <span class="footer-dot">◆</span>
+            <a href="#">Privacy Policy</a>
+            <span class="footer-dot">◆</span>
+            <a href="#">Terms of Service</a>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    {% block extra_js %}
+    {% endblock %}
+
+</body>
+
+</html>

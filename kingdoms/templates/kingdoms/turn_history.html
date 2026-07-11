@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<section class="immersive-hero compact-hero" style="--hero-image: url('{% static 'images/turn-history-one.png' %}');"><div class="hero-content"><p class="eyebrow">Kingdom chronicle</p><h1>Turn History</h1></div></section>
+
+<div class="page-intro">
+    <p>
+        Every season, the realm advances. Every turn is recorded in the royal archives.
+        Below is a complete chronicle of your kingdom’s development through the ages.
+        Study the patterns. Where did your policies strengthen the realm? Where did they fail?
+        Your past decisions shape your future choices.
+    </p>
+</div>
+
+{% if turns %}
+
+    <div class="timeline-table"><table>
+        <thead>
+            <tr>
+                <th>Turn</th>
+                <th>Population</th>
+                <th>Treasury</th>
+                <th>Food</th>
+                <th>Happiness</th>
+                <th>Stability</th>
+                <th>Event</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for turn in turns %}
+
+                <tr>
+
+                    <td>
+                        {{ turn.turn_number }}
+                    </td>
+
+                    <td>
+                        {{ turn.population }}
+                    </td>
+
+                    <td>
+                        {{ turn.treasury|floatformat:0 }}
+                    </td>
+
+                    <td>
+                        {{ turn.food|floatformat:0 }}
+                    </td>
+
+                    <td>
+                        {{ turn.happiness|floatformat:1 }}
+                    </td>
+
+                    <td>
+                        {{ turn.stability|floatformat:1 }}
+                    </td>
+
+                    <td>
+                        {% if turn.event %}
+                            {{ turn.event.get_event_type_display }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <a href="{% url 'turn_detail' turn.id %}">
+                            View Report
+                        </a>
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+        </tbody>
+    </table></div>
+
+{% else %}
+
+    <p>No turns have been played yet.</p>
+
+{% endif %}
+
+<hr>
+
+{% if is_paginated %}
+
+    <div>
+
+        {% if page_obj.has_previous %}
+            <a href="?page=1">« First</a>
+
+            <a href="?page={{ page_obj.previous_page_number }}">
+                Previous
+            </a>
+        {% endif %}
+
+        <span>
+            Page {{ page_obj.number }}
+            of
+            {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">
+                Next
+            </a>
+
+            <a href="?page={{ page_obj.paginator.num_pages }}">
+                Last »
+            </a>
+        {% endif %}
+
+    </div>
+
+{% endif %}
+
+<hr>
+
+<p>
+    <a href="{% url 'dashboard' %}">
+        Return to Dashboard
+    </a>
+</p>
+
+{% endblock %}

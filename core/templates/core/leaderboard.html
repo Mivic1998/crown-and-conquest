@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Leaderboard{% endblock %}
+
+{% block content %}
+<section class="immersive-hero compact-hero" style="--hero-image: url('{% static 'images/bonus-image-two.png' %}');">
+    <div class="hero-content">
+        <p class="eyebrow">Tournament of realms</p>
+        <h1>Leaderboard</h1>
+        <p class="hero-lead">The strongest kingdoms are recorded in gold for rival rulers to study.</p>
+    </div>
+</section>
+
+<section class="ranking-board parchment-panel">
+    {% if kingdom_list %}
+    <div class="ranking-list">
+        {% for kingdom in kingdom_list %}
+            <article class="ranking-card">
+                <div class="rank-medal">#{{ forloop.counter }}</div>
+                <img src="{% static kingdom.crest_image_path %}" alt="{{ kingdom.get_crest_display }} crest" class="ranking-crest">
+                <div>
+                    <h2><a href="{% url 'kingdom_detail' kingdom.slug %}">{{ kingdom.name }}</a></h2>
+                    <p>Ruled by {{ kingdom.owner.username }}</p>
+                </div>
+                <dl>
+                    <div><dt>Score</dt><dd>{{ kingdom.realm_score|floatformat:0 }}</dd></div>
+                    <div><dt>Territory</dt><dd>{{ kingdom.territory_count }}</dd></div>
+                    <div><dt>Population</dt><dd>{{ kingdom.population }}</dd></div>
+                </dl>
+            </article>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p>No kingdoms have risen to fame yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

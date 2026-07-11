@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="page-intro">
+    <h1>Kingdom Settings</h1>
+    <p>Govern the identity of your realm and keep the court’s records in order.</p>
+</div>
+
+<hr>
+
+<h2>Kingdom Identity</h2>
+
+{% if kingdom.is_premium %}
+<section class="royal-identity-preview kingdom-banner banner-{{ kingdom.banner_colour }}" style="--hero-image: url('{% static kingdom.banner_image_path %}');">
+    <img src="{% static kingdom.crest_image_path %}" alt="{{ kingdom.get_crest_display }} crest" class="kingdom-crest">
+    <div>
+        <h3>{{ kingdom.name }}</h3>
+        <p>{{ kingdom.get_banner_colour_display }} · {{ kingdom.get_crest_display }}</p>
+        {% if not kingdom.has_wolf_crest_unlocked %}
+            <p class="identity-unlock-note">Ice Wolf crest unlocks at a leaderboard score of 150,000.</p>
+        {% endif %}
+    </div>
+</section>
+{% else %}
+<div class="premium-lock-box">
+    <h3>Royal Identity is a Premium feature</h3>
+    <p>Upgrade to customise your realm with premium banners and crests.</p>
+</div>
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">
+        Save Changes
+    </button>
+</form>
+
+<hr>
+
+<h2>Account Information</h2>
+
+<ul>
+    <li>
+        <strong>Username:</strong>
+        {{ request.user.username }}
+    </li>
+
+    <li>
+        <strong>Email:</strong>
+        {{ request.user.email }}
+    </li>
+
+    <li>
+        <strong>Kingdom:</strong>
+        {{ kingdom.name }}
+    </li>
+
+    <li>
+        <strong>Ruler:</strong>
+        {{ kingdom.ruler_name }}
+    </li>
+
+    <li>
+        <strong>Current Turn:</strong>
+        {{ kingdom.turn_number }}
+    </li>
+</ul>
+
+<hr>
+
+<h2>Danger Zone</h2>
+
+<p>
+    The actions below are permanent and cannot be undone.
+</p>
+
+<h3>Delete Kingdom</h3>
+
+<p>
+    Permanently destroy your kingdom, including all turn history,
+    event history, and kingdom statistics.
+</p>
+
+<p>
+    <a href="{% url 'delete_kingdom' %}">
+        Delete Kingdom
+    </a>
+</p>
+
+<hr>
+
+<h3>Delete Account</h3>
+
+<p>
+    Permanently delete your account and all associated data,
+    including your kingdom and game history.
+</p>
+
+<p>
+    <a href="{% url 'delete_account' %}">
+        Delete Account
+    </a>
+</p>
+
+<hr>
+
+<div class="action-row">
+    <a href="{% url 'dashboard' %}">
+        Return to Dashboard
+    </a>
+</div>
+
+{% endblock %}

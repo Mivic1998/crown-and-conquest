@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Premium{% endblock %}
+
+{% block content %}
+<section class="immersive-hero premium-hero" style="--hero-image: url('{% static 'images/royal-throne-room.png' %}');">
+    <div class="hero-content">
+        <p class="eyebrow">Royal patronage</p>
+        <h1>Premium</h1>
+        <p class="hero-lead">Upgrade your kingdom with deeper strategy tools while preserving fair game balance.</p>
+    </div>
+</section>
+
+<section class="premium-page parchment-panel">
+    <h2>Premium Features</h2>
+    <div class="premium-feature-grid">
+        <article><h3>6 Daily Turns</h3><p>Progress more actively with twice the standard daily command allowance.</p></article>
+        <article><h3>Premium Royal Council</h3><p>Unlock AI-supported policy advice after saving your economic strategy.</p></article>
+        <article><h3>Advanced Statistics</h3><p>Track economy, society, army, agriculture and infrastructure through clearer charts.</p></article>
+        <article><h3>Turn Comparison</h3><p>See how your latest decisions changed the kingdom since the previous turn.</p></article>
+        <article><h3>CSV Export</h3><p>Export the full chronicle of your kingdom for external analysis.</p></article>
+        <article><h3>Royal Identity</h3><p>Custom royal banners, house crests, and a visible Premium Realm badge distinguish your dynasty. The rare Ice Wolf crest is reserved for realms that surpass 150,000 leaderboard score.</p></article>
+    </div>
+
+    {% if user.kingdom and user.kingdom.is_premium %}
+        <p class="premium-badge">★ You are already premium.</p>
+    {% else %}
+        <form method="post" action="{% url 'payments:checkout' %}" class="embedded-form compact-form">
+            {% csrf_token %}
+            <button type="submit">Subscribe Monthly</button>
+        </form>
+    {% endif %}
+</section>
+
+<p class="text-center mt-4"><a href="{% url 'dashboard' %}">Return to Dashboard</a></p>
+{% endblock %}

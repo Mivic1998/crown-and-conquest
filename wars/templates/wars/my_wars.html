@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}War History{% endblock %}
+
+{% block content %}
+
+<section class="immersive-hero compact-hero war-hero" style="--hero-image: url('{% static 'images/war-history-one.png' %}');">
+    <div class="hero-content"><p class="eyebrow">Campaign records</p><h1>War History</h1></div>
+</section>
+
+
+<div class="container section-block">
+
+    <div class="page-intro">
+        <h1>Military Archives</h1>
+        <p>
+            The annals of your kingdom’s military campaigns. Here lies the record of every conflict declared,
+            every battle fought, and every victory or defeat sustained. Some campaigns remain unresolved,
+            awaiting the opponent’s response or the clash of armies. Others are sealed in history.
+            Study your war record. It reveals whether your realm is master or victim in this world of conflict.
+        </p>
+    </div>
+
+    {% if is_at_war %}
+
+        <div class="alert alert-danger">
+
+            <strong>Your kingdom is currently at war.</strong>
+
+            <p class="mb-2 mt-2">
+                Your realm is currently engaged in a conflict that must be resolved before the next season.
+            </p>
+
+            {% if wars_initiated and wars_initiated.0.status != "resolved" %}
+                <a href="{% url 'wars:war_pending' %}"
+                   class="btn btn-danger">
+                    View Current War
+                </a>
+            {% elif wars_received and wars_received.0.status != "resolved" %}
+                <a href="{% url 'wars:notify_defender' %}"
+                   class="btn btn-danger">
+                    View Current War
+                </a>
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+    <hr>
+
+    <h2 class="mb-3">Wars You Declared</h2>
+
+    {% if wars_initiated %}
+
+        <div class="battle-board">
+
+            {% for war in wars_initiated %}
+
+                <div>
+
+                    <div class="card {% if war.status == 'resolved' %}border-success{% else %}border-warning{% endif %}">
+
+                        <div class="card-header">
+                            <strong>{{ war.defender.name }}</strong>
+
+                            {% if war.status == "resolved" %}
+                                <span class="premium-badge">
+                                    Resolved
+                                </span>
+                            {% else %}
+                                <span class="premium-badge" style="background: linear-gradient(135deg, #f4d18f, #b36f1e);">
+                                    Pending
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body">
+
+                            <p>
+                                <strong>Declared:</strong>
+                                {{ war.declared_at }}
+                            </p>
+
+                            <p>
+                                <a href="{% url 'kingdom_detail' war.defender.slug %}">
+                                    View Opponent Profile
+                                </a>
+                            </p>
+
+                            {% if war.status == "resolved" %}
+
+                                <p>
+                    
+                                    {% if war.winner %}
+                                    <strong>Winner:</strong>
+                                        {{ war.winner.name }}
+                                    {% else %}
+                                    <strong>Outcome:</strong>
+                                        Draw
+                                    {% endif %}
+                                </p>
+
+                                <a href="{% url 'wars:battle_report' war.id %}"
+                                   class="btn btn-primary">
+                                    View Battle Report
+                                </a>
+
+                            {% else %}
+
+                                <p>
+                                    Awaiting the rival ruler’s reply.
+                                </p>
+
+                                <a href="{% url 'wars:war_pending' %}"
+                                   class="btn btn-warning">
+                                    View Pending War
+                                </a>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <p style="color: #fff8e8">No campaigns have been launched from your banners yet.</p>
+
+    {% endif %}
+
+    <hr class="my-5">
+
+    <h2 class="mb-3">Wars Declared Against You</h2>
+
+    {% if wars_received %}
+
+        <div class="battle-board">
+
+            {% for war in wars_received %}
+
+                <div>
+
+                    <div class="card {% if war.status == 'resolved' %}border-success{% else %}border-warning{% endif %}">
+
+                        <div class="card-header">
+                            <strong>{{ war.attacker.name }}</strong>
+
+                            {% if war.status == "resolved" %}
+                                <span class="premium-badge">
+                                    Resolved
+                                </span>
+                            {% else %}
+                                <span class="premium-badge" style="background: linear-gradient(135deg, #f4d18f, #b36f1e);">
+                                    Pending
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body">
+
+                            <p>
+                                <strong>Declared:</strong>
+                                {{ war.declared_at }}
+                            </p>
+
+                            <p>
+                                <a href="{% url 'kingdom_detail' war.attacker.slug %}">
+                                    View Opponent Profile
+                                </a>
+                            </p>
+
+                            {% if war.status == "resolved" %}
+
+                                <p>
+                                    {% if war.winner %}
+                                    <strong>Winner:</strong>
+                                        {{ war.winner.name }}
+                                    {% else %}
+                                    <strong>Outcome:</strong>
+                                        Draw
+                                    {% endif %}
+                                </p>
+
+                                <a href="{% url 'wars:battle_report' war.id %}"
+                                   class="btn btn-primary">
+                                    View Battle Report
+                                </a>
+
+                            {% else %}
+
+                                <p>
+                                    Your answer is still required before the campaign can proceed.
+                                </p>
+
+                                <a href="{% url 'wars:notify_defender' %}"
+                                   class="btn btn-warning">
+                                    Respond
+                                </a>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <p>No rival banners have crossed your borders in recent days.</p>
+
+    {% endif %}
+
+    <hr>
+
+    <a href="{% url 'dashboard' %}">
+        Return to Dashboard
+    </a>
+
+</div>
+
+{% endblock %}

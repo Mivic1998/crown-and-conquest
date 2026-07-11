@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Crown & Conquest{% endblock %}
+
+{% block content %}
+
+<section class="immersive-hero home-hero" style="--hero-image: url('{% static 'images/hero-kingdom-castle.png' %}');">
+    <div class="hero-content">
+        <p class="eyebrow">A medieval strategy simulation</p>
+        <h1>Crown &amp; Conquest</h1>
+        <p class="hero-lead">
+            Rule a living realm of shifting alliances, harvests, unrest and war. Every policy ripples through the seasons ahead; every crisis tests the throne.
+        </p>
+        <div class="action-row hero-actions">
+            {% if user.is_authenticated %}
+                {% if user.kingdom %}
+                    <a href="{% url 'dashboard' %}" class="btn btn-warning">Enter Your Kingdom</a>
+                {% else %}
+                    <a href="{% url 'create_kingdom' %}" class="btn btn-warning">Create Your Kingdom</a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'account_signup' %}" class="btn btn-warning">Begin Your Reign</a>
+                <a href="{% url 'account_login' %}" class="btn btn-outline-light">Login</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="home-features feature-chapter">
+    <div class="section-heading">
+        <p class="eyebrow">The royal mandate</p>
+        <h2>Forge Your Realm</h2>
+        <p>Crown &amp; Conquest is a strategic experience where governance, diplomacy, warfare and legacy are woven together.</p>
+    </div>
+
+    <div class="home-feature-grid illustrated-card-grid">
+        <article class="illustrated-card">
+            <img src="{% static 'images/royal-council-library.png' %}" alt="Royal council chamber">
+            <div><h3>Rule with Authority</h3><span class="ornate-divider"></span><p>Set taxes, fund agriculture, build infrastructure, expand the army and protect welfare. Balance the five pillars well and your kingdom flourishes; neglect them and chaos spreads.</p></div>
+        </article>
+        <article class="illustrated-card">
+            <img src="{% static 'images/events/rebellion.png' %}" alt="Crisis in the realm">
+            <div><h3>Respond to Crises</h3><span class="ornate-divider"></span><p>Plagues, famines, rebellions and betrayals strike without warning. Issue royal decrees and let the council judge your empathy, practicality and leadership.</p></div>
+        </article>
+        <article class="illustrated-card">
+            <img src="{% static 'images/battlefield-royal-army.png' %}" alt="Army on a battlefield">
+            <div><h3>Conquer Through War</h3><span class="ornate-divider"></span><p>Survey neighbouring kingdoms, challenge worthy rivals and rally your troops. Casualties are recorded, victories remembered, and defeats studied.</p></div>
+        </article>
+        <article class="illustrated-card">
+            <img src="{% static 'images/kingdom-countryside.png' %}" alt="Kingdom countryside">
+            <div><h3>Build a Legacy</h3><span class="ornate-divider"></span><p>Every turn advances the realm. Track your statistics, refine policy and build a kingdom remembered for generations.</p></div>
+        </article>
+    </div>
+</section>
+
+<section class="home-premium royal-panel premium-panel" style="--panel-image: url('{% static 'images/regal-throne-room-bathed-in-sunlight.png' %}');">
+    <div>
+        <p class="eyebrow">Premium realms</p>
+        <h2>Rule Beyond Limits</h2>
+        <p>Premium rulers gain additional daily turns, royal distinction, banner customisation and advanced insight for long campaigns.</p>
+        <a href="{% url 'payments:pricing' %}" class="btn btn-warning">View Premium Options</a>
+    </div>
+</section>
+
+{% endblock %}

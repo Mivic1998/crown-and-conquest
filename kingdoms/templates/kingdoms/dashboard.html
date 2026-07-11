@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+{% load static %}
+{% load display_filters %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="dashboard-hero kingdom-banner banner-{{ kingdom.banner_colour }}" style="--hero-image: url('{% if kingdom.is_premium %}{% static kingdom.banner_image_path %}{% else %}{% static 'images/kingdom-city-market.png' %}{% endif %}');">
+    <div class="kingdom-identity-display">
+        <img src="{% static kingdom.crest_image_path %}" alt="{{ kingdom.get_crest_display }} crest" class="kingdom-crest">
+        <div>
+            <h1>
+                {{ kingdom.name }}
+
+                {% if kingdom.is_premium %}
+                    <span class="premium-badge">★ Premium Realm</span>
+                {% endif %}
+            </h1>
+
+            <h3>Ruler: {{ kingdom.ruler_name }}</h3>
+            <p>Turn: {{ kingdom.turn_number }} · Score {{ kingdom.leaderboard_score }}</p>
+        </div>
+    </div>
+</section>
+
+<hr>
+
+<section class="dashboard-actions" aria-label="Realm navigation">
+    <h2>Realm Navigation</h2>
+
+    <a href="{% url 'wars:diplomacy' %}">Diplomacy</a>
+    <a href="{% url 'wars:war_list' %}">War History</a>
+    <a href="{% url 'turn_history' %}">Turn History</a>
+    <a href="{% url 'event_history' %}">Event History</a>
+    <a href="{% url 'kingdom_statistics' %}">Statistics</a>
+    <a href="{% url 'kingdom_settings' %}">Kingdom Settings</a>
+</section>
+
+<hr>
+
+<section class="dashboard-notifications">
+    <h2>Royal Correspondence</h2>
+    <p>Messages and reports from the realm’s councils, captains, and advisors.</p>
+
+    {% if unresolved_event or unseen_turns or pending_war_started or pending_war_received or unseen_battle_reports_started or unseen_battle_reports_received %}
+
+        {% if pending_war_started %}
+            <div class="notification notification-warning">
+                <h3 style="color:#B8860B">War Declaration Sent</h3>
+
+                <p>
+                    Your declaration of war against
+                    {{ pending_war_started.defender.name }}
+                    is awaiting a response.
+                </p>
+
+                <a href="{% url 'wars:war_pending' %}">
+                    View Pending War
+                </a>
+            </div>
+        {% endif %}
+
+        {% if pending_war_received %}
+            <div class="notification notification-danger war-notification">
+                <h3 style="color:#B8860B">War Declaration Received</h3>
+
+                <p>
+                    {{ pending_war_received.attacker.name }}
+                    has declared war upon your kingdom.
+                </p>
+
+                <a href="{% url 'wars:notify_defender' %}">
+                    Respond to War
+                </a>
+            </div>
+        {% endif %}
+
+        {% if unresolved_event %}
+            <div class="notification notification-warning event-notification">
+                <h3 style="color:#B8860B">Crisis Awaiting Response</h3>
+
+                <p>
+                    A {{ unresolved_event.get_event_type_display }}
+                    requires your attention before you can advance.
+                </p>
+
+                <a href="{% url 'respond_to_event' unresolved_event.id %}">
+                    Respond to Crisis
+                </a>
+            </div>
+        {% endif %}
+
+        {% for turn in unseen_turns %}
+            <div class="notification notification-info turn-notification">
+                <h3>Unread Turn Report</h3>
+
+                <p>
+                    Your advisors have prepared the report for
+                    Turn {{ turn.turn_number }}.
+                </p>
+
+                <a href="{% url 'turn_detail' turn.id %}">
+                    View Turn Report
+                </a>
+            </div>
+        {% endfor %}
+
+        {% for war in unseen_battle_reports_started %}
+            <div class="notification notification-info">
+                <h3>Battle Report Available</h3>
+
+                <p>
+                    Your war against {{ war.defender.name }} has been resolved.
+                </p>
+
+                <a href="{% url 'wars:battle_report' war.id %}">
+                    View Battle Report
+                </a>
+            </div>
+        {% endfor %}
+
+        {% for war in unseen_battle_reports_received %}
+            <div class="notification notification-info">
+                <h3>Battle Report Available</h3>
+
+                <p>
+                    The war declared by {{ war.attacker.name }} has been resolved.
+                </p>
+
+                <a href="{% url 'wars:battle_report' war.id %}">
+                    View Battle Report
+                </a>
+            </div>
+        {% endfor %}
+
+    {% else %}
+
+        <p>Your advisors report no matters of urgency within the realm.</p>
+
+    {% endif %}
+</section>
+
+<hr>
+
+<section id="turn-timer" data-turns-remaining="{{ turn_limit.turns_remaining_today }}"
+    data-cooldown-ends-at="{% if turn_limit.cooldown_ends_at %}{{ turn_limit.cooldown_ends_at|date:'c' }}{% endif %}"
+    data-daily-reset-at="{{ turn_limit.daily_reset_at|date:'c' }}">
+    <h2>Turn Availability</h2>
+
+    <p>
+        You have <strong>{{ turn_limit.turns_remaining_today }}</strong> turns remaining today,
+        with a daily limit of <strong>{{ turn_limit.daily_turn_limit }}</strong>.
+    </p>
+
+    <p id="turn-timer-message" class="turn-timer-message">
+        The next season will open in <span id="turn-countdown"></span>.
+    </p>
+</section>
+
+<hr>
+
+<h2>Kingdom Stats</h2>
+<div class="dashboard-stats-intro">
+    <p>
+        Your realm’s strength is measured across multiple dimensions.
+        Population drives your economy and military. Treasury funds your ambitions.
+        Food sustains your people—scarcity brings hardship. Happiness determines loyalty and stability.
+        Stability reflects the health of your institutions. Army Size is your military muscle,
+        while Army Quality determines battle effectiveness. Review these metrics carefully—they are the foundation of your power.
+    </p>
+</div>
+
+<ul class="dashboard-stats resource-card-grid">
+    <li><img src="{% static 'images/logos/population.png' %}" alt=""><span>Population</span><strong>{{ kingdom.population|floor_value }}</strong></li>
+    <li><img src="{% static 'images/logos/gold.png' %}" alt=""><span>Treasury</span><strong>{{ kingdom.treasury|floor_value }}</strong></li>
+    <li><img src="{% static 'images/logos/food.png' %}" alt=""><span>Food</span><strong>{{ kingdom.food|floor_value }}</strong></li>
+    <li><img src="{% static 'images/logos/happiness.png' %}" alt=""><span>Happiness</span><strong>{{ kingdom.happiness|floor_value }}</strong></li>
+    <li><img src="{% static 'images/logos/stability.png' %}" alt=""><span>Stability</span><strong>{{ kingdom.stability|floor_value }}</strong></li>
+    <li><img src="{% static 'images/logos/army-size.png' %}" alt=""><span>Army Size</span><strong>{{ kingdom.army_size|floor_value }}</strong></li>
+    <li><img src="{% static 'images/logos/army-quality.png' %}" alt=""><span>Army Quality</span><strong>{{ kingdom.army_quality|floatformat:2 }}</strong></li>
+    <li><img src="{% static 'images/logos/wars-won.png' %}" alt=""><span>Wars Won</span><strong>{{ kingdom.wars_won }}</strong></li>
+    <li><img src="{% static 'images/logos/wars-lost.png' %}" alt=""><span>Wars Lost</span><strong>{{ kingdom.wars_lost }}</strong></li>
+</ul>
+
+<hr>
+
+<h2>Set Policies</h2>
+<p>Adjust the realm’s priorities and guide the kingdom through the coming season.</p>
+
+<form method="POST" class="policy-form" id="dashboard-form">
+    {% csrf_token %}
+
+    <div class="policy-card slider-group">
+        <label for="id_tax_rate">
+            Tax Rate
+        </label>
+
+        <p class="policy-desc">
+            Higher taxes increase treasury income but may reduce happiness.
+        </p>
+
+        <div class="slider-control-row">
+            <input type="range" name="tax_rate" id="id_tax_rate" min="0" max="50" step="1"
+                value="{{ form.tax_rate.value|default:kingdom.tax_rate }}" class="policy-slider"
+                data-input="tax_rate_manual">
+
+            <input type="number" id="tax_rate_manual" min="0" max="50" step="1"
+                value="{{ form.tax_rate.value|default:kingdom.tax_rate }}" class="policy-manual-input">
+        </div>
+    </div>
+
+    <div class="policy-card slider-group">
+        <label for="id_agriculture_investment">
+            Agriculture Investment
+        </label>
+
+        <p class="policy-desc">
+            Improves food production and long-term agricultural resilience.
+        </p>
+
+        <div class="slider-control-row">
+            <input type="range" name="agriculture_investment" id="id_agriculture_investment" min="0" max="100" step="1"
+                value="{{ form.agriculture_investment.value|default:kingdom.agriculture_investment }}"
+                class="policy-slider" data-input="agriculture_investment_manual">
+
+            <input type="number" id="agriculture_investment_manual" min="0" max="100" step="1"
+                value="{{ form.agriculture_investment.value|default:kingdom.agriculture_investment }}"
+                class="policy-manual-input">
+        </div>
+    </div>
+
+    <div class="policy-card slider-group">
+        <label for="id_infrastructure_investment">
+            Infrastructure Investment
+        </label>
+
+        <p class="policy-desc">
+            Strengthens roads, logistics, trade, and the efficiency of the realm.
+        </p>
+
+        <div class="slider-control-row">
+            <input type="range" name="infrastructure_investment" id="id_infrastructure_investment" min="0" max="100"
+                step="1" value="{{ form.infrastructure_investment.value|default:kingdom.infrastructure_investment }}"
+                class="policy-slider" data-input="infrastructure_investment_manual">
+
+            <input type="number" id="infrastructure_investment_manual" min="0" max="100" step="1"
+                value="{{ form.infrastructure_investment.value|default:kingdom.infrastructure_investment }}"
+                class="policy-manual-input">
+        </div>
+    </div>
+
+    <div class="policy-card slider-group">
+        <label for="id_military_investment">
+            Military Investment
+        </label>
+
+        <p class="policy-desc">
+            Expands and improves your army, preparing the kingdom for war.
+        </p>
+
+        <div class="slider-control-row">
+            <input type="range" name="military_investment" id="id_military_investment" min="0" max="100" step="1"
+                value="{{ form.military_investment.value|default:kingdom.military_investment }}" class="policy-slider"
+                data-input="military_investment_manual">
+
+            <input type="number" id="military_investment_manual" min="0" max="100" step="1"
+                value="{{ form.military_investment.value|default:kingdom.military_investment }}"
+                class="policy-manual-input">
+        </div>
+    </div>
+
+    <div class="policy-card slider-group">
+        <label for="id_welfare_investment">
+            Welfare Investment
+        </label>
+
+        <p class="policy-desc">
+            Supports citizens and improves happiness during difficult times.
+        </p>
+
+        <div class="slider-control-row">
+            <input type="range" name="welfare_investment" id="id_welfare_investment" min="0" max="100" step="1"
+                value="{{ form.welfare_investment.value|default:kingdom.welfare_investment }}" class="policy-slider"
+                data-input="welfare_investment_manual">
+
+            <input type="number" id="welfare_investment_manual" min="0" max="100" step="1"
+                value="{{ form.welfare_investment.value|default:kingdom.welfare_investment }}"
+                class="policy-manual-input">
+        </div>
+    </div>
+
+    <button type="submit" class="royal-button">
+        Save Policies
+    </button>
+</form>
+
+{% if not kingdom.is_premium %}
+<section class="premium-lock-box">
+    <h2>Premium Royal Council</h2>
+    <p>Upgrade to Premium to receive AI-supported policy advice whenever you save your tax and investment strategy.</p>
+    <a href="{% url 'payments:pricing' %}">Unlock Premium Advice</a>
+</section>
+<hr>
+{% endif %}
+
+{% if kingdom.policy_advice %}
+<section class="royal-adviser">
+    <h2>Royal Council Advice</h2>
+
+    <p>
+        <strong>Assessment:</strong>
+        {{ kingdom.policy_advice.summary }}
+    </p>
+
+    <p>
+        <strong>Risk:</strong>
+        {{ kingdom.policy_advice.risk }}
+    </p>
+
+    <p>
+        <strong>Recommendation:</strong>
+        {{ kingdom.policy_advice.recommendation }}
+    </p>
+</section>
+
+<hr>
+{% endif %}
+
+<hr>
+
+<section class="turn-control-panel">
+    <h2>Turn Control</h2>
+    <p>When the council is satisfied, advance the realm into the next season.</p>
+
+    {% if turn_blocked %}
+    <p>{{ turn_blocked_reason }}</p>
+    {% endif %}
+
+    <form action="{% url 'take_turn' %}" method="POST" class="centered-action">
+        {% csrf_token %}
+
+        <button type="submit" {% if turn_blocked %}disabled{% endif %}>
+            End Turn
+        </button>
+    </form>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

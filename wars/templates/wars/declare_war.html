@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Declare War{% endblock %}
+
+{% block content %}
+
+<section class="immersive-hero compact-hero war-hero" style="--hero-image: url('{% static 'images/war-history-three.png' %}');">
+    <div class="hero-content"><p class="eyebrow">The war council</p><h1>Declare War</h1></div>
+</section>
+
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    <h2 class="mb-0">Declare War</h2>
+                </div>
+
+                <div class="card-body">
+
+                    <p class="text-muted">
+                        You are preparing to declare war upon the following kingdom.
+                    </p>
+
+                    <hr>
+
+                    <h3>{{ enemy_kingdom.name }}</h3>
+
+                    <p class="mb-4">
+                        <strong>Ruled by:</strong>
+                        {{ enemy_kingdom.ruler_name }}
+                    </p>
+
+                    <div class="row mb-4">
+
+                        <div class="col-md-6">
+                            <h5>Military</h5>
+
+                            <ul class="list-unstyled">
+                                <li>
+                                    <strong>Army Size:</strong>
+                                    {{ enemy_kingdom.army_size }}
+                                </li>
+
+                                <li>
+                                    <strong>Army Quality:</strong>
+                                    {{ enemy_kingdom.army_quality|floatformat:2 }}
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h5>War Record</h5>
+
+                            <ul class="list-unstyled">
+                                <li>
+                                    <strong>Wars Won:</strong>
+                                    {{ enemy_kingdom.wars_won }}
+                                </li>
+
+                                <li>
+                                    <strong>Wars Lost:</strong>
+                                    {{ enemy_kingdom.wars_lost }}
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>Scouting Report</h5>
+
+                        <p class="text-muted mb-0">
+                            {{ momentum_hint }}
+                        </p>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>Warning</strong>
+
+                        <p class="mb-2">
+                            Once war is declared, your rallying cry will be delivered immediately.
+                        </p>
+
+                        <p class="mb-0">
+                            The defending ruler will have <strong>3 hours</strong> to respond.
+                            If no response is received, the battle will resolve automatically.
+                        </p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {{ form.as_p }}
+
+                        <div class="d-flex justify-content-between mt-4">
+
+                            <a href="{% url 'wars:diplomacy' %}"
+                               class="btn btn-secondary">
+                                Cancel
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-danger">
+                                Declare War
+                            </button>
+
+                        </div>
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

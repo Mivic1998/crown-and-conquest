@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+
+{% block title %}How the Realm Works{% endblock %}
+
+{% block content %}
+
+<section class="mechanics-hero">
+    <h1>How the Realm Works</h1>
+
+    <p>
+        Crown & Conquest is a strategy game about balancing power, prosperity,
+        public order, and military ambition. The exact formulas are hidden, but
+        the principles below explain how your decisions shape the fate of your realm.
+    </p>
+</section>
+
+<hr>
+
+<section class="mechanics-section">
+    <h2>Core Strategy</h2>
+
+    <p>
+        Your kingdom changes over time based on policies, resources, stability,
+        happiness, events, and war. Strong rulers do not simply maximise one value.
+        They balance competing needs.
+    </p>
+
+    <ul>
+        <li>High taxes raise income but can damage happiness.</li>
+        <li>Agriculture supports food production and famine resilience.</li>
+        <li>Infrastructure improves long-term efficiency and economic strength.</li>
+        <li>Military investment strengthens your army but may leave the realm underfunded elsewhere.</li>
+        <li>Welfare helps happiness and stability, especially during difficult periods.</li>
+    </ul>
+</section>
+
+<hr>
+
+<section class="mechanics-section">
+    <h2>Turns</h2>
+
+    <p>
+        Each turn represents a period of rule. When you end a turn, your current
+        policies are processed and your kingdom changes.
+    </p>
+
+    <ul>
+        <li>Your resources may rise or fall.</li>
+        <li>Your population, treasury, food, happiness, and stability may change.</li>
+        <li>Your army may grow or improve depending on investment.</li>
+        <li>A turn report is created so you can review what happened.</li>
+        <li>Random events may occur after a turn.</li>
+    </ul>
+
+    <p>
+        Free rulers receive a limited number of turns per day. Premium rulers
+        receive additional daily turns.
+    </p>
+</section>
+
+<hr>
+
+<section class="mechanics-section">
+    <h2>Policies</h2>
+
+    <p>
+        Policies are your main tool for shaping the kingdom. They do not produce
+        isolated effects; they interact with the wider condition of the realm.
+    </p>
+
+    <h3>Tax Rate</h3>
+    <p>
+        Taxes increase treasury income, but excessive taxation can reduce public
+        happiness and weaken long-term stability.
+    </p>
+
+    <h3>Agriculture Investment</h3>
+    <p>
+        Agriculture improves food production. Low agricultural investment can be
+        dangerous if population is high or food stores are already low.
+    </p>
+
+    <h3>Infrastructure Investment</h3>
+    <p>
+        Infrastructure supports long-term efficiency, trade, logistics, and general
+        economic resilience.
+    </p>
+
+    <h3>Military Investment</h3>
+    <p>
+        Military spending helps increase army strength and quality. However, focusing
+        too heavily on war may weaken food, welfare, or infrastructure.
+    </p>
+
+    <h3>Welfare Investment</h3>
+    <p>
+        Welfare supports citizens and can improve happiness and stability. It is
+        especially useful when taxes are high or the realm is under pressure.
+    </p>
+</section>
+
+<hr>
+
+<section class="mechanics-section">
+    <h2>Food, Happiness, and Stability</h2>
+
+    <p>
+        These three systems are closely connected.
+    </p>
+
+    <ul>
+        <li>Food shortages can damage happiness and stability.</li>
+        <li>Low happiness makes the kingdom more fragile.</li>
+        <li>Low stability increases the danger of unrest and crisis.</li>
+        <li>A large army can help maintain order, but cannot replace good governance.</li>
+    </ul>
+</section>
+
+<hr>
+
+<section class="mechanics-section">
+    <h2>Events and Crises</h2>
+
+    <p>
+        Events represent major problems such as famine, unrest, rebellion,
+        desertion, or economic disruption.
+    </p>
+
+    <p>
+        When an event occurs, you must write a royal response. The AI council
+        evaluates your response on qualities such as empathy, leadership, and
+        practicality.
+    </p>
+
+    <p>
+        Strong responses can reduce the damage caused by a crisis. Weak, vague,
+        cruel, or unrealistic responses may fail to protect the kingdom.
+    </p>
+
+    <div class="mechanics-note">
+        <strong>Important:</strong>
+        The AI does not directly control the game. It provides scores and feedback.
+        The backend simulation applies the final effects.
+    </div>
+</section>
+
+<hr>
+
+<section class="mechanics-section">
+    <h2>AI Evaluation</h2>
+
+    <p>
+        AI is used to judge written player responses. It rewards thoughtful,
+        specific, realistic answers and penalises vague or lazy writing.
+    </p>
+
+    <p>
+        For event responses, the council considers:
+    </p>
+
+    <ul>
+        <li>Does the response address the actual crisis?</li>
+        <li>Is it practical with the kingdom's resources?</li>
+        <li>Does it show leadership?</li>
+        <li>Does it consider the people affected?</li>
+        <li>Does it avoid empty promises?</li>
+    </ul>
+
+    <p>
+        For rallying cries, the council considers:
+    </p>
+
+    <ul>
+        <li>Does the speech inspire the army?</li>
+        <li>Does it show command and purpose?</li>
+        <li>Does it acknowledge danger or sacrifice?</li>
+        <li>Does it offer direction rather than empty glory?</li>
+    </ul>
+</section>
+
+<hr>
+
+<section class="mechanics-section">
+    <h2>War</h2>
+
+    <p>
+        War is resolved through a single decisive battle in the current MVP.
+        There are no sieges, alliances, peace negotiations, or territory transfers yet.
+    </p>
+
+    <p>
+        Battle outcomes are influenced by:
+    </p>
+
+    <ul>
+        <li>Army size</li>
+        <li>Army quality</li>
+        <li>Rallying cry evaluation</li>
+        <li>Hidden momentum</li>
+        <li>Prestige</li>
+        <li>A small random factor</li>
+    </ul>
+
+    <p>
+        The exact result cannot be calculated perfectly by players. This preserves
+        uncertainty and prevents war from becoming a simple comparison of army numbers.
+    </p>
+</section>
+
+<hr>
+
+<section class="mechanics-section">
+    <h2>Momentum and Prestige</h2>
+
+    <p>
+        Momentum and prestige are hidden strategic forces.
+    </p>
+
+    <h3>Momentum</h3>
+    <p>
+        Winning battles can improve a kingdom's confidence and battlefield rhythm.
+        Losing battles can damage it. Momentum is not shown directly, but recent
+        performance may offer clues.
+    </p>
+
+    <h3>Prestige</h3>
+    <p>
+        Prestige rewards rulers who fight worthy opponents. Repeatedly attacking
+        much weaker kingdoms is discouraged and may harm long-term reputation.
+    </p>
+
+    <p>
+        These systems help prevent farming and make war more strategic.
+    </p>
+</section>
+
+<hr>
+
+<section class="mechanics-section">
+    <h2>Battle Reports</h2>
+
+    <p>
+        After a battle, both rulers receive a battle report showing the result,
+        casualties, rallying cries, and council feedback.
+    </p>
+
+    <p>
+        Reports are designed to be immersive. They explain what happened without
+        revealing every hidden modifier.
+    </p>
+</section>
+
+<hr>
+
+<section class="mechanics-section">
+    <h2>Premium Features</h2>
+
+    <p>
+        Premium features provide convenience and visual customisation, not unfair
+        battle advantages.
+    </p>
+
+    <ul>
+        <li>Additional daily turns</li>
+        <li>Premium realm badge</li>
+        <li>Custom banner colour</li>
+    </ul>
+
+    <p>
+        Premium does not directly improve army strength, rallying cry scores, AI
+        evaluations, or battle outcomes.
+    </p>
+</section>
+
+<hr>
+
+<section class="mechanics-section">
+    <h2>Strategic Advice</h2>
+
+    <p>
+        The best rulers study their reports and adapt over time.
+    </p>
+
+    <ul>
+        <li>If food is low, prioritise agriculture.</li>
+        <li>If happiness is falling, reduce pressure or invest in welfare.</li>
+        <li>If stability is weak, avoid reckless taxation and war.</li>
+        <li>If preparing for battle, invest in military strength before declaring war.</li>
+        <li>If your kingdom suffers repeated crises, rebalance instead of doubling down.</li>
+    </ul>
+</section>
+
+<hr>
+
+<section class="mechanics-section">
+    <h2>What Is Hidden?</h2>
+
+    <p>
+        Some values are intentionally hidden to preserve uncertainty.
+    </p>
+
+    <ul>
+        <li>Exact event calculations</li>
+        <li>Exact battle strength calculations</li>
+        <li>Random battle factor</li>
+        <li>Precise momentum value</li>
+        <li>Precise prestige value</li>
+    </ul>
+
+    <p>
+        You are given enough information to make strategic choices, but not enough
+        to solve the game with perfect certainty.
+    </p>
+</section>
+
+<hr>
+
+<section class="mechanics-section">
+    <h2>Future Features</h2>
+
+    <p>
+        The current game focuses on the core kingdom loop and single-battle wars.
+        Future versions may add deeper diplomacy, alliances, peace offers, sieges,
+        territory transfer, espionage, and multi-turn wars.
+    </p>
+</section>
+
+<hr>
+
+<p>
+    <a href="{% url 'dashboard' %}" class="btn btn-primary">
+        Return to Dashboard
+    </a>
+</p>
+
+{% endblock %}

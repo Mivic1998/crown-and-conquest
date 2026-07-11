@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Logout | Crown & Conquest{% endblock %}
+
+{% block content %}
+<section class="auth-shell">
+    <div class="auth-panel parchment-panel">
+        <p class="eyebrow">Leave court</p>
+        <h1>Logout</h1>
+        <div class="ornate-divider"></div>
+        <p class="auth-lead">Are you sure you wish to step away from the throne?</p>
+        <form method="post" action="{% url 'account_logout' %}" class="auth-form auth-actions-inline">
+            {% csrf_token %}
+            {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+            {% endif %}
+            <button type="submit" class="btn btn-warning">Logout</button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Return to Realm</a>
+        </form>
+    </div>
+</section>
+{% endblock %}

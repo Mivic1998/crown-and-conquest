@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Email | Crown & Conquest{% endblock %}
+
+{% block content %}
+<section class="auth-shell">
+    <div class="auth-panel parchment-panel auth-panel-wide">
+        <p class="eyebrow">Royal correspondence</p>
+        <h1>Email Addresses</h1>
+        <div class="ornate-divider"></div>
+        {% if user.emailaddress_set.all %}
+            <form action="{% url 'account_email' %}" method="post" class="auth-form">
+                {% csrf_token %}
+                <div class="auth-email-list">
+                    {% for emailaddress in user.emailaddress_set.all %}
+                    <label class="auth-email-card" for="email_radio_{{ forloop.counter }}">
+                        <input id="email_radio_{{ forloop.counter }}" type="radio" name="email" value="{{ emailaddress.email }}" {% if emailaddress.primary or user.emailaddress_set.all|length == 1 %}checked{% endif %}>
+                        <span>{{ emailaddress.email }}</span>
+                        <small>{% if emailaddress.verified %}Verified{% else %}Unverified{% endif %}{% if emailaddress.primary %} · Primary{% endif %}</small>
+                    </label>
+                    {% endfor %}
+                </div>
+                <div class="auth-actions-inline">
+                    <button name="action_primary" type="submit" class="btn btn-warning">Make Primary</button>
+                    <button name="action_send" type="submit" class="btn btn-secondary">Re-send Verification</button>
+                    <button name="action_remove" type="submit" class="btn btn-danger">Remove</button>
+                </div>
+            </form>
+        {% endif %}
+        <h2>Add Email Address</h2>
+        <form method="post" action="{% url 'account_email' %}" class="auth-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button name="action_add" type="submit" class="btn btn-warning">Add Email</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

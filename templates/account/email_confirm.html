@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Email | Crown & Conquest{% endblock %}
+
+{% block content %}
+<section class="auth-shell">
+    <div class="auth-panel parchment-panel">
+        <p class="eyebrow">Seal correspondence</p>
+        <h1>Confirm Email</h1>
+        <div class="ornate-divider"></div>
+        {% if confirmation %}
+            <p class="auth-lead">Confirm <strong>{{ confirmation.email_address.email }}</strong> as a trusted address for your account.</p>
+            <form method="post" action="{% url 'account_confirm_email' confirmation.key %}" class="auth-form">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning">Confirm Email</button>
+            </form>
+        {% else %}
+            <p class="auth-lead">This email confirmation link is invalid or has expired.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

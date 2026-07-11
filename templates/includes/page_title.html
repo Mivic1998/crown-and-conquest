@@ -1,0 +1,11 @@
+{% load static %}
+<div class="page-title">
+    <img src="{% static 'images/logos/alternate-logo-one.png' %}" alt="" class="page-title-icon" aria-hidden="true">
+    <h1>{{ title }}</h1>
+    {% if subtitle %}
+        <p>{{ subtitle }}</p>
+    {% endif %}
+    <div class="page-title-divider" aria-hidden="true">
+        <span></span>
+    </div>
+</div>

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="kingdom-profile-heading">
+    <img src="{% static kingdom.crest_image_path %}" alt="{{ kingdom.get_crest_display }} crest" class="kingdom-crest">
+    <h1>
+    {{ kingdom.name }}
+
+    {% if kingdom.is_premium %}
+        <span class="premium-badge">Premium Realm</span>
+    {% endif %}
+</h1>
+</div>
+
+<p>
+    Ruled by <strong>{{ kingdom.ruler_name }}</strong>
+</p>
+
+<hr>
+
+<h2>Public Kingdom Profile</h2>
+
+<table>
+    <tr>
+        <th>Leaderboard Score</th>
+        <td>{{ kingdom.leaderboard_score }}</td>
+    </tr>
+
+    <tr>
+        <th>Population</th>
+        <td>{{ kingdom.population }}</td>
+    </tr>
+
+    <tr>
+        <th>Army Size</th>
+        <td>{{ kingdom.army_size }}</td>
+    </tr>
+
+    <tr>
+        <th>Army Quality</th>
+        <td>{{ kingdom.army_quality|floatformat:1 }}</td>
+    </tr>
+
+    <tr>
+        <th>Territories</th>
+        <td>{{ kingdom.territory_count }}</td>
+    </tr>
+
+    <tr>
+        <th>Current Turn</th>
+        <td>{{ kingdom.turn_number }}</td>
+    </tr>
+</table>
+
+<hr>
+
+{% if user.is_authenticated %}
+
+    {% if kingdom.is_at_war %}
+
+        <p>
+            This kingdom is currently at war and cannot be challenged.
+        </p>
+
+    {% else %}
+
+        <p>
+            <a href="{% url 'wars:declare_war' kingdom.slug %}">
+                Declare War
+            </a>
+        </p>
+
+    {% endif %}
+
+{% endif %}
+
+<p>
+    <a href="{% url 'leaderboard' %}">
+        Back to Leaderboard
+    </a>
+</p>
+
+{% if user.is_authenticated %}
+    <p>
+        <a href="{% url 'dashboard' %}">
+            Return to Dashboard
+        </a>
+    </p>
+{% endif %}
+
+{% endblock %}

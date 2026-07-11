@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}War Pending{% endblock %}
+
+{% block content %}
+
+<section class="immersive-hero compact-hero war-hero" style="--hero-image: url('{% static 'images/war-history-four.png' %}');">
+    <div class="hero-content"><p class="eyebrow">Awaiting answer</p><h1>War Pending</h1></div>
+</section>
+
+
+<div class="container section-block">
+
+    <div class="battle-board">
+        <div class="card" style="grid-column: 1 / -1;">
+
+                <div class="card-header">
+                    <h2 class="mb-0">War Declared</h2>
+                </div>
+
+                <div class="card-body">
+
+                    <p class="lead">
+                        Your declaration of war against
+                        <strong>{{ enemy_kingdom.name }}</strong>
+                        has been delivered to their courts.
+                    </p>
+
+                    <div class="alert alert-warning text-center">
+
+                        <h5 class="mb-2">
+                            Time Remaining for Their Reply
+                        </h5>
+
+                        <h2
+                            id="countdown-timer"
+                            data-deadline="{{ war.defender_response_deadline|date:'c' }}"
+                        >
+                            Calculating...
+                        </h2>
+
+                        <p class="mb-0">
+                            If they fail to answer before the timer expires,
+                            the battle will resolve automatically.
+                        </p>
+
+                    </div>
+
+                    <hr>
+
+                    <h3 class="text-center">Opposing Forces</h3>
+
+                    <div class="battle-board">
+
+                        <div class="home-card">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Your Kingdom</h5>
+                                </div>
+
+                                <div class="card-body">
+                                    <h4>{{ kingdom.name }}</h4>
+
+                                    <p class="text-muted">
+                                        Ruled by {{ kingdom.ruler_name }}
+                                    </p>
+
+                                    <ul class="list-unstyled">
+                                        <li>
+                                            <strong>Army Size:</strong>
+                                            {{ kingdom.army_size }}
+                                        </li>
+
+                                        <li>
+                                            <strong>Army Quality:</strong>
+                                            {{ kingdom.army_quality|floatformat:2 }}
+                                        </li>
+
+                                        <li>
+                                            <strong>Wars Won:</strong>
+                                            {{ kingdom.wars_won }}
+                                        </li>
+
+                                        <li>
+                                            <strong>Wars Lost:</strong>
+                                            {{ kingdom.wars_lost }}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="away-card">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Enemy Kingdom</h5>
+                                </div>
+
+                                <div class="card-body">
+                                    <h4>{{ enemy_kingdom.name }}</h4>
+
+                                    <p class="text-muted">
+                                        Ruled by {{ enemy_kingdom.ruler_name }}
+                                    </p>
+
+                                    <ul class="list-unstyled">
+                                        <li>
+                                            <strong>Army Size:</strong>
+                                            {{ enemy_kingdom.army_size }}
+                                        </li>
+
+                                        <li>
+                                            <strong>Army Quality:</strong>
+                                            {{ enemy_kingdom.army_quality|floatformat:2 }}
+                                        </li>
+
+                                        <li>
+                                            <strong>Wars Won:</strong>
+                                            {{ enemy_kingdom.wars_won }}
+                                        </li>
+
+                                        <li>
+                                            <strong>Wars Lost:</strong>
+                                            {{ enemy_kingdom.wars_lost }}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <h3>Your Rallying Cry</h3>
+
+                    <blockquote class="blockquote border-start ps-3">
+                        <p class="mb-0">
+                            "{{ war.attacker_rallying_cry }}"
+                        </p>
+                    </blockquote>
+
+                    <div class="alert alert-info mt-4 mb-4">
+                        <strong>The rival court has not yet answered.</strong>
+
+                        <p class="mb-0 mt-2">
+                            Their ruler may still issue a reply before the timer expires.
+                            If they fail to respond, the battle will be resolved automatically.
+                        </p>
+                    </div>
+
+                    <div class="action-row">
+
+                        <a href="{% url 'wars:diplomacy' %}"
+                           class="btn btn-secondary">
+                            Return to Diplomacy
+                        </a>
+
+                        <a href="{% url 'dashboard' %}"
+                           class="btn btn-primary">
+                            Return to Dashboard
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/war_countdown.js' %}"></script>
+{% endblock %}

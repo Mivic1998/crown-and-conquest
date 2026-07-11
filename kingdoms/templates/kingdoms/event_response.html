@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<section class="immersive-hero event-hero event-{{ event.event_type }}"
+    {% if event.event_type == 'famine' %}style="--hero-image: url('{% static 'images/events/famine.png' %}');"{% elif event.event_type == 'rebellion' %}style="--hero-image: url('{% static 'images/events/rebellion.png' %}');"{% elif event.event_type == 'riot' %}style="--hero-image: url('{% static 'images/events/riot.png' %}');"{% elif event.event_type == 'desertion' %}style="--hero-image: url('{% static 'images/events/desertion.png' %}');"{% elif event.event_type == 'market_crash' %}style="--hero-image: url('{% static 'images/events/market-crash.png' %}');"{% else %}style="--hero-image: url('{% static 'images/placeholder/placeholder.png' %}');"{% endif %}>
+    <div class="hero-content"><p class="eyebrow">Royal crisis</p><h1>{{ event.get_event_type_display|default:event.event_type|title }}</h1><p class="hero-lead">Turn {{ event.turn_number }}</p></div>
+</section>
+<div class="container event-response-shell">
+
+    <div class="card shadow parchment-panel">
+
+        <div class="card-header event-title">
+            <h1>Crisis in the Realm</h1>
+        </div>
+
+        <div class="card-body">
+
+            <h2>{{ event.get_event_type_display|default:event.event_type|title }}</h2>
+
+            <p class="lead">
+                Turn {{ event.turn_number }}
+            </p>
+
+            <hr>
+
+            <h3>Report from your advisors</h3>
+
+            <p>
+                {{ event.description }}
+            </p>
+
+            <hr>
+
+            <h3>Your Royal Decree</h3>
+
+            <p>
+                Your subjects await your decision. Describe the actions you will take to address this crisis.
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="response" class="form-label">
+                        Response
+                    </label>
+
+                    <textarea id="response" name="response" class="form-control" rows="10" required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-danger">
+                    Submit Royal Decree
+                </button>
+
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                    Return to Dashboard
+                </a>
+
+                <a href="{% url 'event_history' %}" class="btn btn-secondary">
+                    View Event History
+                </a>
+
+                {% if error %}
+                <p>{{ error }}</p>
+                {% endif %}
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/statistics.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="immersive-hero compact-hero" style="--hero-image: url('{% static 'images/turn-history-two.png' %}');"><div class="hero-content"><p class="eyebrow">Royal analytics</p><h1>Kingdom Statistics</h1></div></section>
+
+<div class="page-intro">
+    <p>
+        The true measure of a ruler lies in numbers. Below is the statistical record of
+        <strong>{{ kingdom.name }}</strong>. Premium rulers unlock deeper charts,
+        turn-by-turn comparison, and CSV export for analysis outside the game.
+    </p>
+</div>
+
+{% if kingdom.is_premium %}
+    <p class="premium-badge">★ Premium Analytics Unlocked</p>
+    <p>
+        <a href="{% url 'export_turn_history_csv' %}" class="royal-button">
+            Export Turn History CSV
+        </a>
+    </p>
+{% else %}
+    <div class="premium-lock-box">
+        <h2>Premium Analytics Locked</h2>
+        <p>
+            Upgrade to Premium to unlock historical charts, turn comparison,
+            advanced military and infrastructure graphs, and CSV export.
+        </p>
+        <a href="{% url 'payments:pricing' %}">View Premium</a>
+    </div>
+{% endif %}
+
+<hr>
+
+<h2>Current Kingdom Summary</h2>
+<p style="color: #5c655f; font-size: 0.95rem; margin-bottom: 1rem;">
+    A snapshot of your realm as it stands today.
+</p>
+
+<table>
+    <tr><th>Current Turn</th><td>{{ kingdom.turn_number }}</td></tr>
+    <tr><th>Population</th><td>{{ kingdom.population }}</td></tr>
+    <tr><th>Treasury</th><td>{{ kingdom.treasury|floatformat:0 }}</td></tr>
+    <tr><th>Food</th><td>{{ kingdom.food|floatformat:0 }}</td></tr>
+    <tr><th>Happiness</th><td>{{ kingdom.happiness|floatformat:1 }}</td></tr>
+    <tr><th>Stability</th><td>{{ kingdom.stability|floatformat:1 }}</td></tr>
+    <tr><th>Army Size</th><td>{{ kingdom.army_size }}</td></tr>
+    <tr><th>Army Quality</th><td>{{ kingdom.army_quality|floatformat:1 }}</td></tr>
+</table>
+
+{% if kingdom.is_premium %}
+
+    <hr>
+
+    <h2>Turn Comparison</h2>
+    {% if turn_comparison %}
+        <p style="color: #5c655f; font-size: 0.95rem; margin-bottom: 1rem;">
+            Changes since the previous stored turn.
+        </p>
+        <table>
+            <tr><th>Population Change</th><td>{{ turn_comparison.population }}</td></tr>
+            <tr><th>Treasury Change</th><td>{{ turn_comparison.treasury|floatformat:0 }}</td></tr>
+            <tr><th>Food Change</th><td>{{ turn_comparison.food|floatformat:0 }}</td></tr>
+            <tr><th>Happiness Change</th><td>{{ turn_comparison.happiness|floatformat:1 }}</td></tr>
+            <tr><th>Stability Change</th><td>{{ turn_comparison.stability|floatformat:1 }}</td></tr>
+            <tr><th>Army Change</th><td>{{ turn_comparison.army_size }}</td></tr>
+        </table>
+    {% else %}
+        <p>Play at least two turns to unlock turn comparison.</p>
+    {% endif %}
+
+    <hr>
+
+    {% if history|length >= 2 %}
+        <h2>Premium Historical Trends</h2>
+        <p style="color: #5c655f; font-size: 0.95rem; margin-bottom: 1.5rem;">
+            Charts showing the trajectory of your kingdom’s economy, society, military,
+            agriculture, and infrastructure across all turns.
+        </p>
+
+        <div class="chart-scroll">
+            <section class="statistics-chart-block">
+                <h3>Population</h3>
+                <div class="ornate-divider"></div>
+                <div class="statistics-chart"><canvas id="population"></canvas></div>
+            </section>
+
+            <section class="statistics-chart-block">
+                <h3>Treasury</h3>
+                <div class="ornate-divider"></div>
+                <div class="statistics-chart"><canvas id="treasury"></canvas></div>
+            </section>
+
+            <section class="statistics-chart-block">
+                <h3>Food Supply</h3>
+                <div class="ornate-divider"></div>
+                <div class="statistics-chart"><canvas id="food"></canvas></div>
+            </section>
+
+            <section class="statistics-chart-block">
+                <h3>Happiness</h3>
+                <div class="ornate-divider"></div>
+                <div class="statistics-chart"><canvas id="happiness"></canvas></div>
+            </section>
+
+            <section class="statistics-chart-block">
+                <h3>Stability</h3>
+                <div class="ornate-divider"></div>
+                <div class="statistics-chart"><canvas id="stability"></canvas></div>
+            </section>
+
+            <section class="statistics-chart-block">
+                <h3>Army Size</h3>
+                <div class="ornate-divider"></div>
+                <div class="statistics-chart"><canvas id="army_size"></canvas></div>
+            </section>
+
+            <section class="statistics-chart-block">
+                <h3>Army Quality</h3>
+                <div class="ornate-divider"></div>
+                <div class="statistics-chart"><canvas id="army_quality"></canvas></div>
+            </section>
+
+            <section class="statistics-chart-block">
+                <h3>Agriculture</h3>
+                <div class="ornate-divider"></div>
+                <div class="statistics-chart"><canvas id="a_eff"></canvas></div>
+            </section>
+
+            <section class="statistics-chart-block">
+                <h3>Infrastructure</h3>
+                <div class="ornate-divider"></div>
+                <div class="statistics-chart"><canvas id="infra"></canvas></div>
+            </section>
+        </div>
+    {% else %}
+        <h2>Premium Historical Trends</h2>
+        <p>Play at least two turns to unlock kingdom trend charts.</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>Historical Records</h2>
+    <p style="color: #5c655f; font-size: 0.95rem; margin-bottom: 1rem;">
+        A complete turn-by-turn record of your kingdom’s state across the ages.
+    </p>
+
+    {% if history %}
+    <table>
+        <thead>
+            <tr>
+                <th>Turn</th>
+                <th>Population</th>
+                <th>Treasury</th>
+                <th>Food</th>
+                <th>Happiness</th>
+                <th>Stability</th>
+                <th>Army</th>
+                <th>Infrastructure</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for turn in history %}
+            <tr>
+                <td>{{ turn.turn_number }}</td>
+                <td>{{ turn.population }}</td>
+                <td>{{ turn.treasury|floatformat:0 }}</td>
+                <td>{{ turn.food|floatformat:0 }}</td>
+                <td>{{ turn.happiness|floatformat:1 }}</td>
+                <td>{{ turn.stability|floatformat:1 }}</td>
+                <td>{{ turn.army_size }}</td>
+                <td>{{ turn.infra|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>Your kingdom has not yet accumulated enough history to generate statistics.</p>
+    {% endif %}
+
+{% endif %}
+
+<hr>
+
+<p>
+    <a href="{% url 'dashboard' %}">Return to Dashboard</a>
+</p>
+
+{% endblock %}
+
+{% block extra_js %}
+{% if kingdom.is_premium %}
+{{ chart_data|json_script:"chart-data" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/statistics.js' %}"></script>
+{% endif %}
+{% endblock %}

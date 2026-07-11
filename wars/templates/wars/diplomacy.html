@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Diplomacy{% endblock %}
+
+{% block content %}
+
+<section class="immersive-hero compact-hero war-hero" style="--hero-image: url('{% static 'images/diplomacy-one.png' %}');">
+    <div class="hero-content"><p class="eyebrow">Border intelligence</p><h1>Diplomacy</h1></div>
+</section>
+
+
+<div class="container section-block">
+
+    <div class="page-intro">
+        <h1>Border Intelligence</h1>
+        <p>
+            War is the continuation of policy by other means. Before the clash of arms, there is reconnaissance.
+            The scouts have returned with intelligence about neighbouring realms. Study their military strength.
+            Observe their war record. Choose a worthy rival. When you are ready to test them in battle, declare war.
+            Only kingdoms of comparable strength may be challenged—the realm maintains this balance to ensure meaningful conflict.
+        </p>
+    </div>
+
+    {% if kingdoms %}
+
+        <div class="battle-board">
+
+            {% for kingdom in kingdoms %}
+
+                <div>
+
+                    <div class="card h-100">
+
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h3>{{ kingdom.name }}</h3>
+                                    <p class="mb-0">Ruled by {{ kingdom.ruler_name }}</p>
+                                </div>
+
+                                <span class="premium-badge">
+                                    Available
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="row">
+
+                                <div class="col-6">
+                                    <h6>Military</h6>
+
+                                    <ul class="list-unstyled">
+                                        <li>
+                                            <strong>Army Size:</strong>
+                                            {{ kingdom.army_size }}
+                                        </li>
+
+                                        <li>
+                                            <strong>Army Quality:</strong>
+                                            {{ kingdom.army_quality|floatformat:2 }}
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="col-6">
+                                    <h6>War Record</h6>
+
+                                    <ul class="list-unstyled">
+                                        <li>
+                                            <strong>Victories:</strong>
+                                            {{ kingdom.wars_won }}
+                                        </li>
+
+                                        <li>
+                                            <strong>Defeats:</strong>
+                                            {{ kingdom.wars_lost }}
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </div>
+
+                            <hr>
+
+                            <h6>Intelligence Report</h6>
+
+                            <p class="text-muted mb-0">
+                                Scouts estimate this kingdom possesses
+                                approximately <strong>{{ kingdom.army_size }}</strong>
+                                soldiers of
+                                <strong>{{ kingdom.army_quality|floatformat:2 }}</strong>
+                                quality.
+                            </p>
+
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="action-row">
+
+                                <a href="{% url 'kingdom_detail' kingdom.slug %}">
+                                    View Kingdom
+                                </a>
+
+                                <a href="{% url 'wars:declare_war' kingdom.slug %}" class="btn btn-danger">
+                                    Declare War
+                                </a>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="card mt-5">
+            <div class="card-body text-center">
+                <h3>No Eligible Kingdoms</h3>
+
+                <p>
+                    There are currently no realms in reach of a lawful challenge.
+                </p>
+            </div>
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

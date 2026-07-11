@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load socialaccount %}
+
+{% block title %}Sign Up | Crown & Conquest{% endblock %}
+
+{% block content %}
+<section class="auth-shell">
+    <div class="auth-panel parchment-panel">
+        <p class="eyebrow">Found a dynasty</p>
+        <h1>Create Account</h1>
+        <div class="ornate-divider"></div>
+        <p class="auth-lead">Create your account, then raise your kingdom from a fragile realm into a lasting empire.</p>
+
+        <a class="social-login-button" href="{% provider_login_url 'google' process='signup' %}">
+            <span class="social-mark">G</span>
+            Continue with Google
+        </a>
+
+        <div class="auth-separator"><span>or create royal credentials</span></div>
+
+        <form method="post" action="{% url 'account_signup' %}" class="auth-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+            {% endif %}
+            <button type="submit" class="btn btn-warning">Begin</button>
+        </form>
+
+        <p class="auth-alt mt-5">Already sworn in? <a href="{% url 'account_login' %}">Login</a>.</p>
+    </div>
+</section>
+{% endblock %}
