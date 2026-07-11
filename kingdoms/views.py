@@ -241,6 +241,13 @@ def take_turn(request):
 
 @login_required
 def respond_to_event(request, event_id):
+    if not hasattr(request.user, "kingdom"):
+        messages.info(
+            request,
+            "You need to create a kingdom before responding to an event.",
+        )
+        return redirect("create_kingdom")
+
     event = get_object_or_404(
         Event,
         id=event_id,
@@ -295,6 +302,16 @@ class EventHistoryListView(LoginRequiredMixin, ListView):
     context_object_name = "events"
     paginate_by = 20
 
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "kingdom"):
+            messages.info(
+                request,
+                "You need to create a kingdom before accessing event history.",
+            )
+            return redirect("create_kingdom")
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
         return Event.objects.filter(
             kingdom=self.request.user.kingdom
@@ -302,6 +319,13 @@ class EventHistoryListView(LoginRequiredMixin, ListView):
 
 @login_required
 def event_detail(request, event_id):
+    if not hasattr(request.user, "kingdom"):
+        messages.info(
+            request,
+            "You need to create a kingdom before accessing event detail.",
+        )
+        return redirect("create_kingdom")
+    
     event = get_object_or_404(
         Event,
         id=event_id,
@@ -340,6 +364,16 @@ class TurnHistoryListView(LoginRequiredMixin, ListView):
     context_object_name = "turns"
     paginate_by = 20
 
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "kingdom"):
+            messages.info(
+                request,
+                "You need to create a kingdom before accessing turn history.",
+            )
+            return redirect("create_kingdom")
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
         return TurnHistory.objects.filter(
             kingdom=self.request.user.kingdom
@@ -348,6 +382,14 @@ class TurnHistoryListView(LoginRequiredMixin, ListView):
 
 @login_required
 def turn_detail(request, turn_id):
+
+    if not hasattr(request.user, "kingdom"):
+        messages.info(
+            request,
+            "You need to create a kingdom before accessing event detail.",
+        )
+        return redirect("create_kingdom")
+
     turn = get_object_or_404(
         TurnHistory,
         id=turn_id,
@@ -372,6 +414,14 @@ def turn_detail(request, turn_id):
 
 @login_required
 def delete_kingdom(request):
+    
+    if not hasattr(request.user, "kingdom"):
+        messages.info(
+            request,
+            "You need to create a kingdom before deleting it.",
+        )
+        return redirect("create_kingdom")
+
     kingdom = get_object_or_404(
         Kingdom,
         owner=request.user,

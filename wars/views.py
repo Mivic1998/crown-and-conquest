@@ -21,6 +21,17 @@ class DiplomacyView(LoginRequiredMixin, ListView):
     template_name = "wars/diplomacy.html"
     context_object_name = "kingdoms"
 
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "kingdom"):
+            messages.info(
+                request,
+                "You need to create a kingdom before accessing diplomacy.",
+            )
+            return redirect("create_kingdom")
+
+        return super().dispatch(request, *args, **kwargs)
+
+
     def get_queryset(self):
         my_kingdom = self.request.user.kingdom
         now = timezone.now()
@@ -161,6 +172,10 @@ def declare_war(request, slug):
 
 @login_required
 def war_pending(request):
+    if not hasattr(request.user, "kingdom"):
+        messages.error(request, "You must have a kingdom to have declared a war.")
+        return redirect("create_kingdom")
+    
     kingdom = request.user.kingdom
 
     war = get_object_or_404(
@@ -199,6 +214,9 @@ def war_pending(request):
 
 @login_required
 def notify_defender(request):
+    if not hasattr(request.user, "kingdom"):
+        messages.error(request, "You must have a kingdom to receive war notifications.")
+        return redirect("create_kingdom")
     war = get_object_or_404(War, defender=request.user.kingdom, status="pending_defender")
     kingdom = request.user.kingdom
     enemy_kingdom = war.attacker
