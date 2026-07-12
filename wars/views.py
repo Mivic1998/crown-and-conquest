@@ -31,7 +31,6 @@ class DiplomacyView(LoginRequiredMixin, ListView):
 
         return super().dispatch(request, *args, **kwargs)
 
-
     def get_queryset(self):
         my_kingdom = self.request.user.kingdom
         now = timezone.now()
