@@ -67,7 +67,7 @@
             </p>
 
             <p>
-                Event: <strong>{{ turn.event|title }}</strong>
+                Event: <strong>{{ turn.event.get_event_type_display }}</strong>
             </p>
 
             <a href="{% url 'respond_to_event' turn.event.id %}" class="btn btn-danger">
