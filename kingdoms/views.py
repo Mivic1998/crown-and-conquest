@@ -23,7 +23,6 @@ from .utils import build_effect_comparison, calculate_score, next_midnight
 
 @login_required
 def dashboard(request):
-
     if not hasattr(request.user, "kingdom"):
         messages.info(
             request,
@@ -32,7 +31,6 @@ def dashboard(request):
         return redirect("create_kingdom")
 
     kingdom = request.user.kingdom
-
     kingdom.refresh_war_availability()
 
     unresolved_event = kingdom.events.filter(
@@ -96,7 +94,14 @@ def dashboard(request):
         )
 
         if form.is_valid():
-            form.save()
+            kingdom = form.save()
+
+            investment_total = (
+                kingdom.agriculture_investment
+                + kingdom.infrastructure_investment
+                + kingdom.military_investment
+                + kingdom.welfare_investment
+            )
 
             if kingdom.is_premium:
                 policy_advice = evaluate_policy_decision(
@@ -104,34 +109,52 @@ def dashboard(request):
                     form.cleaned_data,
                 )
 
-                kingdom.policy_advice = policy_advice
-
-                kingdom.save(
-                    update_fields=[
-                        "policy_advice"
-                    ]
-                )
+                kingdom.policy_advice = policy_advice or {}
+                kingdom.save(update_fields=["policy_advice"])
 
                 success_message = (
                     "Policies saved. Your premium royal council "
                     "has prepared advice."
                 )
-
             else:
                 success_message = (
                     "Policies saved. Upgrade to Premium to unlock "
                     "royal council advice."
                 )
 
-            messages.success(
-                request,
-                success_message,
-            )
-
+            messages.success(request, success_message)
             return redirect("dashboard")
+
+        submitted_total = sum(
+            int(request.POST.get(field, 0) or 0)
+            for field in [
+                "agriculture_investment",
+                "infrastructure_investment",
+                "military_investment",
+                "welfare_investment",
+            ]
+        )
+
+        messages.error(
+            request,
+            f"Your investments currently total {submitted_total}%. "
+            "They must total exactly 100% before they can be saved.",
+        )
+
+        investment_total = submitted_total
+        can_take_turn = False
 
     else:
         form = PolicyForm(instance=kingdom)
+
+        investment_total = (
+            kingdom.agriculture_investment
+            + kingdom.infrastructure_investment
+            + kingdom.military_investment
+            + kingdom.welfare_investment
+        )
+
+        can_take_turn = investment_total == 100
 
     return render(
         request,
@@ -151,7 +174,9 @@ def dashboard(request):
             ),
             "unseen_battle_reports_started": (
                 unseen_battle_reports_started
-            )
+            ),
+            "investment_total": investment_total,
+            "can_take_turn": can_take_turn,
         },
     )
 
@@ -214,7 +239,7 @@ def take_turn(request):
             )    
         return redirect('dashboard')    
     
-    kingdom.policy_advice = None
+    kingdom.policy_advice = {}
 
     with transaction.atomic():
         event, turn = process_turn(kingdom)

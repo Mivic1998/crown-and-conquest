@@ -342,7 +342,7 @@
     <form action="{% url 'take_turn' %}" method="POST" class="centered-action">
         {% csrf_token %}
 
-        <button type="submit" {% if turn_blocked %}disabled{% endif %}>
+        <button type="submit" {% if turn_blocked or not can_take_turn %}disabled{% endif %}>
             End Turn
         </button>
     </form>

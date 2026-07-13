@@ -5,7 +5,7 @@ from .views import dashboard, create_kingdom, take_turn, respond_to_event, Event
 urlpatterns = [
     path("dashboard/", views.dashboard, name="dashboard"),
     path("create_kingdom/", views.create_kingdom, name="create_kingdom"),
-    path("take_turn/", views.take_turn, name="take_turn"),
+    path("turn_feedback/", views.take_turn, name="take_turn"),
     path("events/<int:event_id>/respond/", views.respond_to_event, name="respond_to_event"),
     path("events/", views.EventHistoryListView.as_view(), name="event_history"),
     path("events/<int:event_id>/", views.event_detail, name="event_detail"),

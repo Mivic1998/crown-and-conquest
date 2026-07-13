@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load static %}
+{% load display_filters %}
 
 {% block content %}
 
@@ -20,7 +22,7 @@
     <section class="report-section">
         <h3>Kingdom State</h3>
         <table>
-            <tr><th>Population</th><td>{{ turn.population }}</td></tr>
+            <tr><th>Population</th><td>{{ turn.population|floor_value }}</td></tr>
             <tr><th>Treasury</th><td>{{ turn.treasury|floatformat:0 }}</td></tr>
             <tr><th>Food</th><td>{{ turn.food|floatformat:0 }}</td></tr>
             <tr><th>Happiness</th><td>{{ turn.happiness|floatformat:1 }}</td></tr>

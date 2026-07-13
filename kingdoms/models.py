@@ -208,24 +208,24 @@ class TurnHistory(models.Model):
     )   
 
     # Snapshot of key values
-    population = models.IntegerField()
-    treasury = models.FloatField()
-    food = models.FloatField()
+    population = models.IntegerField(default=1000)
+    treasury = models.FloatField(default=500)
+    food = models.FloatField(default=1000)
 
-    happiness = models.FloatField()
-    stability = models.FloatField()
+    happiness = models.FloatField(default=50)
+    stability = models.FloatField(default=50)
 
-    army_size = models.IntegerField()
-    army_quality = models.FloatField()
+    army_size = models.IntegerField(default=100)
+    army_quality = models.FloatField(default=1.0)
 
-    a_eff = models.FloatField()
-    infra = models.FloatField()
+    a_eff = models.FloatField(default=1.0)
+    infra = models.FloatField(default=1.0)
 
-    tax_rate = models.FloatField()
-    agriculture_investment = models.FloatField()
-    infrastructure_investment = models.FloatField()
-    military_investment = models.FloatField()
-    welfare_investment = models.FloatField()
+    tax_rate = models.FloatField(default=20)
+    agriculture_investment = models.FloatField(default=25)
+    infrastructure_investment = models.FloatField(default=25)
+    military_investment = models.FloatField(default=25)
+    welfare_investment = models.FloatField(default=25)
 
     report_seen = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -77,7 +77,7 @@ def evaluate_events(kingdom):
         "riot": 0.03 + (100 - happiness)/100 * 0.2 + (100 - stability)/100 * 0.2,
         "rebellion": max(0, (50 - stability)/100 + (50 - happiness)/100) * 0.4,
         "market_crash": 0.02 + (tax_rate/100 * 0.2) + ((100 - stability)/100 * 0.3),
-        "desertion": (100 - happiness)/100 * 0.3
+        "desertion": 1
     }
 
     roll = random.uniform(0, 1)

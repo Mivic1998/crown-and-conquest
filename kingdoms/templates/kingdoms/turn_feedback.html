@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load display_filters %}
 
 {% block content %}
 
@@ -14,13 +15,13 @@
         <div class="card-body">
 
             <h4>Population</h4>
-            <p>{{ turn.population }} citizens</p>
+            <p>{{ turn.population|floor_value }} citizens</p>
 
             <h4>Treasury</h4>
-            <p>{{ turn.treasury }} gold</p>
+            <p>{{ turn.treasury|floor_value }} gold</p>
 
             <h4>Food Stores</h4>
-            <p>{{ turn.food }} food</p>
+            <p>{{ turn.food|floor_value }} food</p>
 
             <h4>Happiness</h4>
             <p>{{ turn.happiness|floatformat:1 }}/100</p>
@@ -45,10 +46,10 @@
 
             <ul>
                 <li>Tax Rate: {{ turn.tax_rate }}%</li>
-                <li>Agricultural Investment: {{ turn.agriculture_investment }}</li>
-                <li>Infrastructure Investment: {{ turn.infrastructure_investment }}</li>
-                <li>Military Investment: {{ turn.military_investment }}</li>
-                <li>Welfare Investment: {{ turn.welfare_investment }}</li>
+                <li>Agricultural Investment: {{ turn.agriculture_investment }}%</li>
+                <li>Infrastructure Investment: {{ turn.infrastructure_investment }}%</li>
+                <li>Military Investment: {{ turn.military_investment }}%</li>
+                <li>Welfare Investment: {{ turn.welfare_investment }}%</li>
             </ul>
 
         </div>
@@ -103,12 +104,6 @@
             Back to Turn History
         </a>
 
-    </div>
-
-    <div class="text-center mt-4">
-        <a href="{% url 'dashboard' %}" class="btn btn-primary">
-            Return to Dashboard
-        </a>
     </div>
 
 </div>

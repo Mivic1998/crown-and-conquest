@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'cloudinary_storage',
     'django.contrib.sites',
+    'django_extensions',
 
     # Third-party apps
     'allauth',
