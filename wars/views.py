@@ -29,6 +29,24 @@ class DiplomacyView(LoginRequiredMixin, ListView):
             )
             return redirect("create_kingdom")
 
+        kingdom = request.user.kingdom
+
+        has_pending_war = (
+            kingdom.wars_started.filter(
+                status="pending_defender",
+            ).exists()
+            or kingdom.wars_received.filter(
+                status="pending_defender",
+            ).exists()
+        )
+
+        if has_pending_war:
+            messages.info(
+                request,
+                "You must resolve the current war before accessing diplomacy.",
+            )
+            return redirect("dashboard")
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -36,35 +54,44 @@ class DiplomacyView(LoginRequiredMixin, ListView):
         now = timezone.now()
 
         queryset = Kingdom.objects.exclude(
-            id=my_kingdom.id
+            id=my_kingdom.id,
         ).filter(
-            war_available_until__gte=now
+            war_available_until__gte=now,
         )
 
-        # Strength range filter
-        my_strength = my_kingdom.army_size * my_kingdom.army_quality
+        my_strength = (
+            my_kingdom.army_size
+            * my_kingdom.army_quality
+        )
 
         min_strength = my_strength * 0.65
         max_strength = my_strength * 1.45
 
         queryset = [
-            kingdom for kingdom in queryset
-            if min_strength <= kingdom.army_size * kingdom.army_quality <= max_strength
+            kingdom
+            for kingdom in queryset
+            if min_strength
+            <= kingdom.army_size * kingdom.army_quality
+            <= max_strength
         ]
 
-        # Cooldown filter
-        blocked_defender_ids = WarCooldown.objects.filter(
-            attacker=my_kingdom,
-            cooldown_ends_at__gt=now,
-        ).values_list("defender_id", flat=True)
+        blocked_defender_ids = set(
+            WarCooldown.objects.filter(
+                attacker=my_kingdom,
+                cooldown_ends_at__gt=now,
+            ).values_list(
+                "defender_id",
+                flat=True,
+            )
+        )
 
         queryset = [
-            kingdom for kingdom in queryset
+            kingdom
+            for kingdom in queryset
             if kingdom.id not in blocked_defender_ids
         ]
 
         return queryset
-
 
 @login_required
 def declare_war(request, slug):
