@@ -1,3 +1,5 @@
+/* global Chart */
+
 const charts = document.querySelectorAll(".statistics-chart canvas");
 const chartDataElement = document.getElementById("chart-data");
 

@@ -13,8 +13,6 @@
         {% endblock %}
     </title>
 
-    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
-
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,7 +33,7 @@
 <body>
 
     <header class="site-header">
-        <nav class="navbar navbar-expand-xxl royal-navbar" aria-label="Primary navigation">
+        <nav class="navbar navbar-expand-xxl royal-navbar" data-bs-theme="dark" aria-label="Primary navigation">
             <div class="container-fluid royal-navbar-inner">
                 <a class="navbar-brand royal-brand" href="{% url 'home' %}">
                     <img src="{% static 'images/logos/alternate-logo-one.png' %}" alt="Crown & Conquest crest"
@@ -48,132 +46,79 @@
                     aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="collapse navbar-collapse" id="primaryNavigation">
-
-                    <ul class="navbar-nav royal-nav ms-auto">
-
+                    <ul class="navbar-nav royal-nav ms-auto mb-2 mb-xxl-0">
                         {% if user.is_authenticated %}
-
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
-                                href="{% url 'dashboard' %}">
-                                Dashboard
-                            </a>
+                                href="{% url 'dashboard' %}">Dashboard</a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'diplomacy' %}active{% endif %}"
-                                href="{% url 'wars:diplomacy' %}">
-                                Diplomacy
-                            </a>
+                                href="{% url 'wars:diplomacy' %}">Diplomacy</a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'war_list' %}active{% endif %}"
-                                href="{% url 'wars:war_list' %}">
-                                War History
-                            </a>
+                                href="{% url 'wars:war_list' %}">War History</a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'turn_history' %}active{% endif %}"
-                                href="{% url 'turn_history' %}">
-                                Turn History
-                            </a>
+                                href="{% url 'turn_history' %}">Turn History</a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'event_history' %}active{% endif %}"
-                                href="{% url 'event_history' %}">
-                                Events
-                            </a>
+                                href="{% url 'event_history' %}">Events</a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'kingdom_statistics' %}active{% endif %}"
-                                href="{% url 'kingdom_statistics' %}">
-                                Statistics
-                            </a>
+                                href="{% url 'kingdom_statistics' %}">Statistics</a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link premium-link {% if request.resolver_match.url_name == 'pricing' %}active{% endif %}"
                                 href="{% url 'payments:pricing' %}">
-                                {% if user.kingdom and user.kingdom.is_premium %}
-                                Premium
-                                {% else %}
-                                Upgrade
-                                {% endif %}
+                                {% if user.kingdom and user.kingdom.is_premium %}Premium{% else %}Upgrade{% endif %}
                             </a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'kingdom_settings' %}active{% endif %}"
-                                href="{% url 'kingdom_settings' %}">
-                                Settings
-                            </a>
+                                href="{% url 'kingdom_settings' %}">Settings</a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'account_logout' %}active{% endif %}"
-                                href="{% url 'account_logout' %}">
-                                Logout
-                            </a>
+                                href="{% url 'account_logout' %}">Logout</a>
                         </li>
-
                         {% else %}
-
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
-                                href="{% url 'home' %}">
-                                Home
-                            </a>
+                                href="{% url 'home' %}">Home</a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}"
-                                href="{% url 'leaderboard' %}">
-                                Leaderboard
-                            </a>
+                                href="{% url 'leaderboard' %}">Leaderboard</a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'mechanics' %}active{% endif %}"
-                                href="{% url 'mechanics' %}">
-                                How It Works
-                            </a>
+                                href="{% url 'mechanics' %}">How It Works</a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link premium-link {% if request.resolver_match.url_name == 'pricing' %}active{% endif %}"
-                                href="{% url 'payments:pricing' %}">
-                                Premium
-                            </a>
+                                href="{% url 'payments:pricing' %}">Premium</a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'account_login' %}active{% endif %}"
-                                href="{% url 'account_login' %}">
-                                Login
-                            </a>
+                                href="{% url 'account_login' %}">Login</a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link nav-link-cta {% if request.resolver_match.url_name == 'account_signup' %}active{% endif %}"
-                                href="{% url 'account_signup' %}">
-                                Begin
-                            </a>
+                                href="{% url 'account_signup' %}">Begin</a>
                         </li>
-
                         {% endif %}
-
                     </ul>
-
                 </div>
-
+            </div>
         </nav>
     </header>
-
 
     <main>
         {% if messages %}
