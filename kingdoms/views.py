@@ -265,7 +265,7 @@ def take_turn(request):
     )
 
 @login_required
-def respond_to_event(request, event_id):
+def respond_to_event(request):
     if not hasattr(request.user, "kingdom"):
         messages.info(
             request,
@@ -275,10 +275,11 @@ def respond_to_event(request, event_id):
 
     event = get_object_or_404(
         Event,
-        id=event_id,
         kingdom=request.user.kingdom, 
         is_resolved=False
     )
+
+    event_id = event.id
 
     kingdom = request.user.kingdom
     kingdom.refresh_war_availability()

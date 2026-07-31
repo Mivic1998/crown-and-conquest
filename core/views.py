@@ -6,11 +6,9 @@ from django.views import generic
 from kingdoms.models import Kingdom
 from django.db.models import F, Value, IntegerField, ExpressionWrapper
 from django.db.models.functions import Cast
-from django.views.decorators.clickjacking import xframe_options_exempt
 
 # Create your views here.
 
-@xframe_options_exempt
 def home(request):
     return render(request, "core/home.html")
 
