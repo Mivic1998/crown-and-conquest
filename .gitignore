@@ -5,5 +5,3 @@ __pycache__/
 db.sqlite3
 staticfiles/
 lighthouse-auth/node_modules/
-testing/
-readme/
