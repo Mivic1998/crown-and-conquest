@@ -15,6 +15,12 @@ import random
 from .events import evaluate_events
 from .models import Kingdom, TurnHistory
 
+MAX_ARMY_POPULATION_RATIO = 0.15
+
+
+def army_manpower_cap(population):
+    """Maximum army size that can be supported by the population."""
+    return max(0, int(population * MAX_ARMY_POPULATION_RATIO))
 
 def clamp(value, minimum, maximum):
     """Restrict a numeric value to an inclusive minimum and maximum range.
@@ -246,12 +252,27 @@ def process_turn(kingdom):
     )
     army_strength = kingdom.army_size * army_effectiveness
 
-    # Military allocation increases army size directly. Integer conversion
-    # creates threshold effects, meaning very small allocations may not add a
-    # complete troop during the current turn.
-    military_growth = military / 100 * 5
-    kingdom.army_size += int(military_growth)
+    # Military investment determines how many soldiers the kingdom would like
+# to recruit this turn.
+    desired_recruits = int(military / 100 * 5)
 
+# Population limits the total pool of soldiers the kingdom can support.
+    max_army_size = army_manpower_cap(kingdom.population)
+
+# Work out how much unused manpower is currently available.
+    available_manpower = max(
+        0,
+        max_army_size - kingdom.army_size,
+    )
+
+# Recruitment cannot exceed either the military investment or the manpower
+# available from the population.
+    actual_recruits = min(
+        desired_recruits,
+        available_manpower,
+    )
+
+    kingdom.army_size += actual_recruits
     # ------------------------------------------------------------------
     # 9. Happiness
     # ------------------------------------------------------------------
