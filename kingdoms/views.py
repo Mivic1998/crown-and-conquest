@@ -77,45 +77,45 @@ def dashboard(request):
     # Warfare availability depends on deadlines and cooldown timestamps.
     # Refreshing it when the dashboard opens ensures that displayed war actions
     # reflect the current time rather than stale database state.
-    kingdom.refresh_war_availability()
+    kingdom.refresh_war_availability() #Kingdoms are only available for war if they have been active within a certain timeframe. This method refreshes the kingdom's war availability when visiting the dashboard.
 
     # An unresolved event prevents the player from advancing another turn.
     # The template uses this object to display the crisis notification and a
     # link to the event-response page.
     unresolved_event = kingdom.events.filter(
-        is_resolved=False,
+        is_resolved=False, #Kingdoms with outstanding events cannot take new turns until the event is resolved, this filter checks for any unresolved events associated with the kingdom.
     ).first()
 
     # Turn reports remain visible in the dashboard notification area until
     # their detail pages mark them as seen.
     unseen_turns = kingdom.history.filter(
-        report_seen=False,
+        report_seen=False, #If a turn report has not been viewed by the player, it is considered unseen. This filter retrieves all unseen turn reports for the kingdom which are displayed in the dashboard notifications.
     ).all()
 
     # Received and initiated wars are retrieved separately because the
     # dashboard displays different text and links for attacker and defender.
     pending_war_received = kingdom.wars_received.filter(
-        status="pending_defender",
+        status="pending_defender", #This filter retrieves wars where the kingdom is the defender and the war is pending. It allows the dashboard to display notifications for wars that require the player's response as a defender.
     ).first()
 
     pending_war_started = kingdom.wars_started.filter(
-        status="pending_defender",
+        status="pending_defender", #This filter retrieves wars where the kingdom is the attacker and the war is pending. It allows the player to view the war pending page of the war they initiated while it is unresolved.
     ).first()
 
     # Resolved battle reports are also separated according to the current
     # kingdom's role in the war. The template uses the related attacker or
     # defender name when constructing notification text.
     unseen_battle_reports_started = kingdom.wars_started.filter(
-        status="resolved",
+        status="resolved", 
         battle__report_seen=False,
-    ).order_by("-resolved_at")
+    ).order_by("-resolved_at") #This filter retrieves battle reports for resolved wars where the kingdom was the attacker and the report has not been seen.
 
     unseen_battle_reports_received = kingdom.wars_received.filter(
         status="resolved",
         battle__report_seen=False,
-    ).order_by("-resolved_at")
+    ).order_by("-resolved_at") #This filter retrieves battle reports for resolved wars where the kingdom was the defender and the report has not been seen.
 
-    turn_limit = kingdom.turn_limit
+    turn_limit = kingdom.turn_limit #Retrieves the TurnLimit object associated with the kingdom, which tracks the number of turns remaining for the day and any cooldown periods. This object is used to determine whether the player can currently take a turn.
 
     # Refresh the allowance before displaying it because the daily reset may
     # have passed since the player's previous request.
@@ -126,10 +126,10 @@ def dashboard(request):
     # ``cooldown_ends_at`` value.
     if not turn_limit.cooldown_active():
         turn_limit.cooldown_ends_at = None
-        turn_limit.save(update_fields=["cooldown_ends_at"])
+        turn_limit.save(update_fields=["cooldown_ends_at"]) #If the cooldown period has expired or doesn't exist, the cooldown_ends_at field in the TurnLimit model is cleared to prevent the dashboard from displaying an outdated countdown timer and to allow the player to take a turn if they have remaining turns available.
 
-    turn_blocked = False
-    turn_blocked_reason = ""
+    turn_blocked = False #Creates a flag which is set to False by default and changed to True if the player is blocked from taking a turn for any reason.
+    turn_blocked_reason = "" #Specifies the reason for the turn being blocked if one exists. Displayed in the dashboard to inform the player why they cannot take a turn.
 
     # Event resolution takes priority over the ordinary turn-limit checks.
     if unresolved_event:
@@ -148,7 +148,7 @@ def dashboard(request):
         else:
             turn_blocked_reason = (
                 "You have no turns remaining today."
-            )
+            ) #This section starting from the if statement checks each condition that could block the player from taking a turn. If the player is blocked, the boolean is set to true and the player receives the appropriate messages explaining why they are unable to take a turn.
 
     if request.method == "POST":
         # Binding the ModelForm to the existing kingdom updates that record
@@ -168,7 +168,7 @@ def dashboard(request):
                 + kingdom.infrastructure_investment
                 + kingdom.military_investment
                 + kingdom.welfare_investment
-            )
+            ) #Used for displaying the total of the four policy investments to the dashboard.
 
             if kingdom.is_premium:
                 # Only validated form values are sent to the AI service.
@@ -177,12 +177,12 @@ def dashboard(request):
                 policy_advice = evaluate_policy_decision(
                     kingdom,
                     form.cleaned_data,
-                )
+                ) #If the Kingdom is premium, the validated policy allocation is sent to the AI evaluation service, which returns structured advice for the player. Stored as JSON dictionary.
 
                 # The dashboard reads ``summary``, ``risk``, and
                 # ``recommendation`` from this JSON-compatible dictionary.
                 kingdom.policy_advice = policy_advice or {}
-                kingdom.save(update_fields=["policy_advice"])
+                kingdom.save(update_fields=["policy_advice"]) #Policy advice saved either as the AI-generated dictionary if advice was returned, or an empty dictionary if the AI service was unavailable.
 
                 success_message = (
                     "Policies saved. Your premium royal council "
@@ -192,7 +192,7 @@ def dashboard(request):
                 success_message = (
                     "Policies saved. Upgrade to Premium to unlock "
                     "royal council advice."
-                )
+                ) #Success message displayed after saving the policy allocation, which differs depending on whether the player has received AI council advice, which is provided if they are a premiuma account.
 
             # Redirect-after-POST prevents a browser refresh from resubmitting
             # the policy form.
@@ -210,7 +210,7 @@ def dashboard(request):
                 "military_investment",
                 "welfare_investment",
             ]
-        )
+        ) #If the form is not valid, the submitted total is calculated from the raw POST data to provide feedback to the player about the exact total they submitted.
 
         messages.error(
             request,
@@ -218,11 +218,11 @@ def dashboard(request):
             "They must total exactly 100% before they can be saved.",
         )
 
-        investment_total = submitted_total
+        investment_total = submitted_total 
 
         # The template must not present the policy allocation as turn-ready
         # when the submitted values are invalid.
-        can_take_turn = False
+        can_take_turn = False #The player can not take a turn if the submitted policy allocation is invalid, so the boolean is set to False to block the end turn button.
 
     else:
         # An unbound form displays the policies currently stored on the kingdom.
@@ -233,11 +233,11 @@ def dashboard(request):
             + kingdom.infrastructure_investment
             + kingdom.military_investment
             + kingdom.welfare_investment
-        )
+        ) 
 
         # This value describes policy validity only. Turn availability itself
         # is controlled separately through ``turn_blocked``.
-        can_take_turn = investment_total == 100
+        can_take_turn = investment_total == 100 #The player can only take a turn if the investment total is exactly 100%, which is what this boolean is checking.
 
     return render(
         request,
@@ -385,12 +385,12 @@ def take_turn(request):
         ``kingdoms/turn_feedback.html`` after success, or a redirect with a
         warning when the turn cannot be processed.
     """
-    kingdom = getattr(request.user, "kingdom", None)
+    kingdom = getattr(request.user, "kingdom", None) #Retrieves the kingdom associated with the authenticated user.
 
     if kingdom is None:
         return redirect("create_kingdom")
 
-    kingdom.refresh_war_availability()
+    kingdom.refresh_war_availability() #Inactive kingdoms are not available for war. This method refreshes the kingdom's war availability when taking a turn to ensure that its status is up to date.
 
     # This check is repeated here even though the dashboard disables the turn
     # control. A user could otherwise submit directly to this endpoint.
@@ -399,10 +399,10 @@ def take_turn(request):
             request,
             "You must resolve the current crisis before advancing the realm.",
         )
-        return redirect("dashboard")
+        return redirect("dashboard") #Checks for any unresolved events, which will block the turn. This has already been checked in the dashboard view, but is repeated here to prevent user from bypassing the dashboard via URL manipulation.
 
     turn_limit = kingdom.turn_limit
-    turn_limit.refresh_daily_turns()
+    turn_limit.refresh_daily_turns() #Before checking the turn limit, the daily allowance is refreshed to ensure the player's remaining turns are up to date.
 
     if not turn_limit.can_take_turn():
         if turn_limit.cooldown_active():
@@ -419,24 +419,24 @@ def take_turn(request):
                 "You have no turns remaining. Please try again tomorrow.",
             )
 
-        return redirect("dashboard")
+        return redirect("dashboard") #This block checks whether the player can take a turn based on their remaining turns and cooldown status. If they cannot, they are redirected to the dashboard with the appropriate warning message.
 
     # Council advice describes the proposed policies before they are processed.
     # Once a turn begins, that advice is no longer current.
-    kingdom.policy_advice = {}
+    kingdom.policy_advice = {} #Council advice is cleared after the turn is processed because the kingdom has evolved and the previous advice is no longer relevant.
 
     # If any operation fails, all changes made inside this block are rolled
     # back. This prevents a consumed allowance without a completed turn, or a
     # completed turn without its historical record.
-    with transaction.atomic():
-        event, turn = process_turn(kingdom)
-        turn_limit.use_turn()
+    with transaction.atomic(): #If any operation within this block fails, all changes made to the database are rolled back so that the kingdom is not partially updated. This ensures that the turn is either fully processed or not at all.
+        event, turn = process_turn(kingdom) #Processes the turn for the kingdom using the function from simulation.py. This function updates the kingdom's state. creates a TurnHistory snapshot for record-keeping, and may generate a new event.
+        turn_limit.use_turn() #TurnLimit method which decrements the remaining turns for the day and updates the cooldown timestamp in the TurnLimit model.
 
         if event:
             # ``process_turn`` returns an event-type key rather than creating
             # the Event record itself. This view connects it to the precise
             # TurnHistory snapshot created during the same transaction.
-            data = EVENT_EFFECTS.get(event, {})
+            data = EVENT_EFFECTS.get(event, {}) #Retrieves the event's predefined effects from the EVENT_EFFECTS dictionary from events.py using the event type returned by process_turn.
 
             Event.objects.create(
                 kingdom=kingdom,
@@ -444,7 +444,7 @@ def take_turn(request):
                 turn_number=turn.turn_number,
                 event_type=event,
                 description=data.get("description", ""),
-            )
+            ) #If an event was generated by the simulation, the database creates a new Event record associated with the kingdom and the current TurnHistory snapshot.
 
     return render(
         request,
@@ -479,7 +479,7 @@ def respond_to_event(request):
             request,
             "You need to create a kingdom before responding to an event.",
         )
-        return redirect("create_kingdom")
+        return redirect("create_kingdom") #Prevents URL manipulation by checking that the user owns a kingdom before accessing the event response page.
 
     # Filtering by kingdom and unresolved state enforces ownership and prevents
     # an already completed event from being processed twice.
@@ -487,10 +487,10 @@ def respond_to_event(request):
         Event,
         kingdom=request.user.kingdom,
         is_resolved=False,
-    )
+    ) #Retrieves the current unresolved event for the kingdom. If no such event exists, a 404 error is returned.
 
     kingdom = request.user.kingdom
-    kingdom.refresh_war_availability()
+    kingdom.refresh_war_availability() #Kingdom considered active if it is responding to an event, so it is refreshed to ensure that its war availability is up to date.
 
     if request.method == "POST":
         response = request.POST.get("response", "").strip()
@@ -517,12 +517,12 @@ def respond_to_event(request):
         ai_result = evaluate_event_response(
             event=event,
             player_response=response,
-        )
+        ) #Sends the player's response for AI evaluation.
 
         event.player_response = response
         event.empathy = ai_result["empathy"]
         event.practicality = ai_result["practicality"]
-        event.leadership = ai_result["leadership"]
+        event.leadership = ai_result["leadership"] #Block which stores the player's response and the individual AI scores in the event record.
 
         # The application calculates the overall result from the individual
         # category scores instead of accepting a final score from Gemini.
@@ -530,20 +530,20 @@ def respond_to_event(request):
             event.empathy,
             event.practicality,
             event.leadership,
-        )
+        ) #Helper function that calculates the overall score from the indvidual category scores returned by the AI.
 
         event.ai_feedback = ai_result["feedback"]
         event.is_resolved = True
         event.resolved_at = timezone.now()
-        event.save()
+        event.save() #Stores feedback, marks event as resolved and timestamps the resolution in the database.
 
         # The effect service scales and applies the consequences to the kingdom,
         # then stores the exact effects for later comparison in the report.
-        apply_event_response_effects(event)
+        apply_event_response_effects(event) #Applies the scaled effects of the event to the kingdom after adjusting the predefined effects based on the player's AI score.
 
         # Redirect-after-POST prevents a page refresh from resolving the event
         # again.
-        return redirect("event_detail", event_id=event.id)
+        return redirect("event_detail", event_id=event.id) #Player is immediately redirected to the event detail page, the event object is passed into the template so that feedback is instantly accessible.
 
     return render(
         request,
@@ -583,7 +583,7 @@ class EventHistoryListView(LoginRequiredMixin, ListView):
             )
             return redirect("create_kingdom")
 
-        return super().dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs) #*********
 
     def get_queryset(self):
         """Return only events belonging to the current kingdom."""
@@ -591,7 +591,7 @@ class EventHistoryListView(LoginRequiredMixin, ListView):
         # history. Newest event turns appear first.
         return Event.objects.filter(
             kingdom=self.request.user.kingdom,
-        ).order_by("-turn_number")
+        ).order_by("-turn_number") 
 
 
 @login_required
@@ -610,7 +610,7 @@ def event_detail(request, event_id):
             request,
             "You need to create a kingdom before accessing event detail.",
         )
-        return redirect("create_kingdom")
+        return redirect("create_kingdom") 
 
     # Including the current kingdom in the lookup prevents access to another
     # player's event by changing the numeric ID in the URL.
@@ -618,29 +618,29 @@ def event_detail(request, event_id):
         Event,
         id=event_id,
         kingdom=request.user.kingdom,
-    )
+    ) #Checks whether the event with the given ID exists and belongs to the user's kingdom. If not, a 404 error is returned.
 
-    # Retrieve the event's original predefined consequences.
-    original_effects = EVENT_EFFECTS.get(event.event_type, {})
+    
+    original_effects = EVENT_EFFECTS.get(event.event_type, {}) #Retrieve the event's original predefined consequences.
 
     # Build rows comparing the original effects with the scaled values that
     # were actually applied after evaluating the player's response.
     effect_comparison = build_effect_comparison(
         original_effects,
         event.applied_effects,
-    )
+    ) #Builds a comparison table of the original effects and the scaled effects that were applied after AI evaluation.
 
     # The previous state is retained for display before the database flag is
     # changed. The template shows whether the player has just opened a new
     # report or revisited an older one.
-    was_unseen = not event.report_seen
+    was_unseen = not event.report_seen #Checks if the event has been seen by the player, used in template to condition text for new vs previously viewed reports.
 
     if not event.report_seen:
         event.report_seen = True
-        event.save(update_fields=["report_seen"])
+        event.save(update_fields=["report_seen"]) #Now that the player has opened the event report, the flag is updated in the database to mark the event as seen.
 
     kingdom = request.user.kingdom
-    kingdom.refresh_war_availability()
+    kingdom.refresh_war_availability() #War availability is refreshed as the kingdom has been active by viewing an event report.
 
     return render(
         request,
@@ -689,7 +689,7 @@ class TurnHistoryListView(LoginRequiredMixin, ListView):
         """Return the current kingdom's newest turn records first."""
         return TurnHistory.objects.filter(
             kingdom=self.request.user.kingdom,
-        ).order_by("-turn_number")
+        ).order_by("-turn_number") #Exact same mechanism as the event history view, but applied to turn history records instead of events.
 
 
 @login_required
@@ -740,7 +740,7 @@ def turn_detail(request, turn_id):
             # Controls the new-report or previously viewed message.
             "was_unseen": was_unseen,
         },
-    )
+    ) #Exact same mechanism as the event detail view, but applied to turn history records instead of events.
 
 
 @login_required
@@ -772,7 +772,7 @@ def delete_kingdom(request):
     )
 
     # Preserve the name because the Kingdom instance is unavailable after
-    # deletion.
+    # deletion for user message.
     kingdom_name = kingdom.name
     kingdom_exists = True
 
@@ -795,7 +795,7 @@ def delete_kingdom(request):
                         "You must type DELETE KINGDOM exactly to confirm."
                     ),
                 },
-            )
+            ) #Same as delete account in core views
 
         kingdom.delete()
         kingdom_exists = False
@@ -900,14 +900,14 @@ def kingdom_statistics(request):
 
     # Chronological ordering is required for both the historical table and the
     # chart datasets.
-    turns = kingdom.history.order_by("turn_number")
+    turns = kingdom.history.order_by("turn_number") #Retrieves all historical turn snapshots in order for charting and comparison.
 
     # The latest history record generally represents the same completed state
     # as the live Kingdom. The second-latest snapshot therefore provides the
     # preceding state for a meaningful comparison.
-    previous_turn = turns[len(turns) - 2] if len(turns) >= 2 else None
+    previous_turn = turns[len(turns) - 2] if len(turns) >= 2 else None #If there are at least two historical turns, the second-latest turn is retrieved for comparison with the latest turn. If there is only one or no historical turns, previous_turn is set to None.
 
-    turn_comparison = None
+    turn_comparison = None #Variable initialized to None to hold the differences between the latest turn and the previous turn. If there is no previous turn, it remains None.
 
     if previous_turn:
         # These pre-calculated differences allow the template to focus on
@@ -919,7 +919,7 @@ def kingdom_statistics(request):
             "happiness": kingdom.happiness - previous_turn.happiness,
             "stability": kingdom.stability - previous_turn.stability,
             "army_size": kingdom.army_size - previous_turn.army_size,
-        }
+        } #Differences between the current kingdom statistics and previous turn's statistics are calculated and stored in a dictionary for the template to display.
 
     # Each list follows the same chronological order. JavaScript can therefore
     # use one index to refer to the same historical turn across all series.
@@ -934,7 +934,7 @@ def kingdom_statistics(request):
         "army_quality": [turn.army_quality for turn in turns],
         "a_eff": [turn.a_eff for turn in turns],
         "infra": [turn.infra for turn in turns],
-    }
+    } #Chart data prepared as a dictionary of lists, where each list contains the values of a specific statistic across all historical turns. The labels list contains the turn numbers for the x-axis of the chart.
 
     kingdom.refresh_war_availability()
 
